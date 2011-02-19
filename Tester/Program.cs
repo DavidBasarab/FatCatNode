@@ -11,12 +11,11 @@ namespace Tester
     internal class Program
     {
         private static readonly object LockObj = new object();
+        private static Uri _baseAddress;
         public static ServiceHost Host { get; set; }
         public static ServiceHost AnnouncementServiceHost { get; set; }
 
         public static string TesterId { get; set; }
-
-        private static Uri _baseAddress;
 
         public static Uri BaseAddress
         {
@@ -26,12 +25,16 @@ namespace Tester
             }
         }
 
+        public static ITestNode ConnectedNode { get; set; }
+
         private static void Main()
         {
             try
             {
                 Console.Write("Please enter tester id: ");
-                TesterId = Console.ReadLine();
+                // ReSharper disable PossibleNullReferenceException
+                TesterId = Console.ReadLine().Replace(" ", string.Empty);
+                // ReSharper restore PossibleNullReferenceException
 
                 Console.WriteLine(Environment.NewLine);
 
@@ -73,7 +76,7 @@ namespace Tester
 
             string ipAddress = Dns.GetHostEntry(hostName).FindIPAddress();
 
-            return new Uri(string.Format("http://{0}:21213/{1}/FatCatNode", ipAddress, id));
+            return new Uri(string.Format("http://{0}:21213/{1}/FatCatNode", ipAddress, TesterId));
         }
 
         private static void PrintErrorMessageToConsole(Exception ex)
@@ -123,8 +126,6 @@ namespace Tester
             ConnectedNode = null;
         }
 
-        public static ITestNode ConnectedNode { get; set; }
-
         private static void ConnectToNode(Uri otherAddress)
         {
             if (BaseAddress == otherAddress)
@@ -141,7 +142,7 @@ namespace Tester
 
         public static ChannelFactory<T> CreateChannelFactory<T>(Uri endpointAddress, Binding binding)
         {
-            Type contractType = typeof(T);
+            Type contractType = typeof (T);
 
             ServiceEndpoint endpoint = CreateServiceEndpoint(contractType, binding, endpointAddress);
 
@@ -150,7 +151,8 @@ namespace Tester
 
         public static ServiceEndpoint CreateServiceEndpoint(Type contractType, Binding binding, Uri endpointAddress)
         {
-            return new ServiceEndpoint(ContractDescription.GetContract(contractType), binding, new EndpointAddress(endpointAddress));
+            return new ServiceEndpoint(ContractDescription.GetContract(contractType), binding,
+                                       new EndpointAddress(endpointAddress));
         }
     }
 }
