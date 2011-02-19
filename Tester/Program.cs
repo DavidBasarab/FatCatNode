@@ -70,8 +70,6 @@ namespace Tester
 
         private static Uri FindNodeAddress()
         {
-            Guid id = Guid.NewGuid();
-
             string hostName = Dns.GetHostName();
 
             string ipAddress = Dns.GetHostEntry(hostName).FindIPAddress();
