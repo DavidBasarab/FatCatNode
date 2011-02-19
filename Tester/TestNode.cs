@@ -8,7 +8,7 @@ namespace Tester
     {
         private readonly object _lockObj = new object();
 
-        public void Message(string message, params object[] args)
+        public void Message(string nodeId, string message, params object[] args)
         {
             lock (_lockObj)
             {
@@ -18,7 +18,7 @@ namespace Tester
 
                 string fullMessage = string.Format(message, args);
 
-                Console.WriteLine("Message Received: {0}", fullMessage);
+                Console.WriteLine("Message From {1}: {0}", fullMessage, nodeId);
 
                 Console.ForegroundColor = prevColor;
             }

@@ -135,7 +135,7 @@ namespace Tester
 
             ConnectedNode = channelFactory.CreateChannel();
 
-            ConnectedNode.Message("I just connected to you at {0} | From: {1}", DateTime.Now, TesterId);
+            ConnectedNode.Message(TesterId, "I just connected to you at {0} | From: {1}", DateTime.Now, TesterId);
         }
 
         public static ChannelFactory<T> CreateChannelFactory<T>(Uri endpointAddress, Binding binding)

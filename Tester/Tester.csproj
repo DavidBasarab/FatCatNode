@@ -45,6 +45,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Common.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="ITestNode.cs" />
     <Compile Include="Program.cs" />

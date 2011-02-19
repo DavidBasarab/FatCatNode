@@ -6,6 +6,6 @@ namespace Tester
     public interface ITestNode
     {
         [OperationContract]
-        void Message(string message, params object[] args);
+        void Message(string nodeId, string message, params object[] args);
     }
 }
