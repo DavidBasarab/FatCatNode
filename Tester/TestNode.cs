@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ServiceModel;
 
 namespace Tester
@@ -7,6 +8,8 @@ namespace Tester
     public class TestNode : ITestNode
     {
         private readonly object _lockObj = new object();
+
+        public Dictionary<string, TestNode> ConnectedTestNodes { get; set; }
 
         public void Message(string nodeId, string message, params object[] args)
         {
@@ -22,6 +25,16 @@ namespace Tester
 
                 Console.ForegroundColor = prevColor;
             }
+        }
+
+        public void HandShake(string requestNodeId, Uri requestingAddress)
+        {
+            throw new NotImplementedException();
+        }
+
+        public NodeStatus GetStatus(string requestNodeId)
+        {
+            throw new NotImplementedException();
         }
     }
 }

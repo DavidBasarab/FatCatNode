@@ -5,9 +5,11 @@ using System.Text;
 
 namespace Tester
 {
-    internal enum NodeStatus
+    public enum NodeStatus
     {
         NotReady,
-        Ready
+        Ready,
+        Connected,
+        NotConnected
     }
 }

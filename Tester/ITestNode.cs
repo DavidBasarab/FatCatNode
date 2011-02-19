@@ -1,4 +1,5 @@
-﻿using System.ServiceModel;
+﻿using System;
+using System.ServiceModel;
 
 namespace Tester
 {
@@ -7,5 +8,11 @@ namespace Tester
     {
         [OperationContract]
         void Message(string nodeId, string message, params object[] args);
+
+        [OperationContract]
+        void HandShake(string requestNodeId, Uri requestingAddress);
+
+        [OperationContract]
+        NodeStatus GetStatus(string requestNodeId);
     }
 }
