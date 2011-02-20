@@ -4,6 +4,13 @@ namespace FatCatNode.Logic
 {
     public class NodeListener
     {
+        public NodeListener(string nodeId)
+        {
+            Id = nodeId;
+        }
+
+        public string Id { get; private set; }
+
         public void Start()
         {
             RegisterForOfflineAndOnLineEvents();
