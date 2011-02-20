@@ -114,7 +114,7 @@ namespace Tester
             Console.WriteLine();
             Console.WriteLine("Received an online announcement from {0}", e.EndpointDiscoveryMetadata.Address);
 
-            ConnectToNode(e.EndpointDiscoveryMetadata.Address.Uri);
+            //ConnectToNode(e.EndpointDiscoveryMetadata.Address.Uri);
         }
 
         private static void OnOfflineEvent(object sender, AnnouncementEventArgs e)
@@ -123,34 +123,6 @@ namespace Tester
 
             ConnectedNode = null;
         }
-
-        private static void ConnectToNode(Uri otherAddress)
-        {
-            if (BaseAddress == otherAddress)
-            {
-                return;
-            }
-
-            ChannelFactory<ITestNode> channelFactory = CreateChannelFactory<ITestNode>(otherAddress, new WSHttpBinding());
-
-            ConnectedNode = channelFactory.CreateChannel();
-
-            ConnectedNode.Message(TesterId, "I just connected to you at {0} | From: {1}", DateTime.Now, TesterId);
-        }
-
-        public static ChannelFactory<T> CreateChannelFactory<T>(Uri endpointAddress, Binding binding)
-        {
-            Type contractType = typeof (T);
-
-            ServiceEndpoint endpoint = CreateServiceEndpoint(contractType, binding, endpointAddress);
-
-            return new ChannelFactory<T>(endpoint);
-        }
-
-        public static ServiceEndpoint CreateServiceEndpoint(Type contractType, Binding binding, Uri endpointAddress)
-        {
-            return new ServiceEndpoint(ContractDescription.GetContract(contractType), binding,
-                                       new EndpointAddress(endpointAddress));
-        }
+        
     }
 }

@@ -10,7 +10,7 @@ namespace Tester
         void Message(string nodeId, string message, params object[] args);
 
         [OperationContract]
-        void HandShake(string requestNodeId, Uri requestingAddress);
+        string HandShake(string requestNodeId, Uri requestingAddress);
 
         [OperationContract]
         NodeStatus GetStatus(string requestNodeId);

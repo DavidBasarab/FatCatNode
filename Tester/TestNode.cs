@@ -27,7 +27,7 @@ namespace Tester
             }
         }
 
-        public void HandShake(string requestNodeId, Uri requestingAddress)
+        public string HandShake(string requestNodeId, Uri requestingAddress)
         {
             throw new NotImplementedException();
         }
