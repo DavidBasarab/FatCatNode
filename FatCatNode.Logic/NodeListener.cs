@@ -1,4 +1,6 @@
-﻿using System.ServiceModel.Discovery;
+﻿using System;
+using System.ServiceModel.Discovery;
+using FatCatNode.Logic.Interfaces;
 
 namespace FatCatNode.Logic
 {
@@ -11,11 +13,13 @@ namespace FatCatNode.Logic
 
         public string Id { get; private set; }
 
-        public void Start()
+        public void Start(INode instance, Uri baseAddress)
         {
             RegisterForOfflineAndOnLineEvents();
 
             NodeAnnouncementService.AnnoucementService.Start();
+
+            ServiceHostHelper.Helper.OpenServiceHost(instance, baseAddress);
         }
 
         private void RegisterForOfflineAndOnLineEvents()
