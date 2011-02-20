@@ -1,33 +1,28 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.ServiceModel.Discovery;
-using System.Text;
-using FatCatNode.Logic.Interfaces;
+﻿using System.ServiceModel.Discovery;
 
 namespace FatCatNode.Logic
 {
     public class NodeListener
     {
-        public NodeListener()
+        public void Start()
+        {
+            RegisterForOfflineAndOnLineEvents();
+
+            NodeAnnouncementService.AnnoucementService.Start();
+        }
+
+        private void RegisterForOfflineAndOnLineEvents()
         {
             NodeAnnouncementService.AnnoucementService.OnOnlineEvent += OnOnlineEvent;
             NodeAnnouncementService.AnnoucementService.OnOfflineEvent += OnOfflineEvent;
         }
 
-        public void Start()
-        {
-            NodeAnnouncementService.AnnoucementService.Start();
-        }
-
         private void OnOnlineEvent(object sender, AnnouncementEventArgs e)
         {
-
         }
 
         private void OnOfflineEvent(object sender, AnnouncementEventArgs e)
         {
-
         }
     }
 }

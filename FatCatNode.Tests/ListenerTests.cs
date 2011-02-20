@@ -33,5 +33,27 @@ namespace FatCatNode.Tests
 
             mocks.VerifyAll();
         }
+
+        [Test]
+        public void OnLineAndOffLineEventsAreRegisterdOnStartUpOnly()
+        {
+            MockRepository mocks = new MockRepository();
+
+            IAnnouncementService announcementService = mocks.DynamicMock<IAnnouncementService>();
+
+            announcementService.OnOnlineEvent += null;
+            LastCall.IgnoreArguments().Repeat.Never();
+
+            announcementService.OnOfflineEvent += null;
+            LastCall.IgnoreArguments().Repeat.Never();
+
+            mocks.ReplayAll();
+
+            NodeAnnouncementService.AnnoucementService = announcementService;
+
+            NodeListener listener = new NodeListener();
+
+            mocks.VerifyAll();
+        }
     }
 }
