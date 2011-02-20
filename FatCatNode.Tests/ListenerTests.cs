@@ -9,7 +9,7 @@ namespace FatCatNode.Tests
     [TestFixture]
     public class ListenerTests
     {
-        public MockRepository Mocks { get; set; }
+        #region Setup/Teardown
 
         [SetUp]
         public void SetUp()
@@ -26,6 +26,24 @@ namespace FatCatNode.Tests
             NodeAnnouncementService.AnnoucementService = null;
         }
 
+        #endregion
+
+        public MockRepository Mocks { get; set; }
+
+        private void StubServiceHostHelper()
+        {
+            var serviceHostHelper = Mocks.Stub<IServiceHostHelper>();
+
+            ServiceHostHelper.Helper = serviceHostHelper;
+        }
+
+        private void StubAnnoucementService()
+        {
+            var announcementServiceStub = Mocks.Stub<IAnnouncementService>();
+
+            NodeAnnouncementService.AnnoucementService = announcementServiceStub;
+        }
+
         [Test]
         public void ANodeListenerIsCreatedWithAId()
         {
@@ -34,6 +52,36 @@ namespace FatCatNode.Tests
             var listener = new NodeListener(nodelistenid);
 
             Assert.That(listener.Id, Is.EqualTo(nodelistenid));
+        }
+
+        [Test]
+        public void AnnouncementServiceStartIsCalledBeforeTheServiceHostIsOpened()
+        {
+            var announcementService = Mocks.DynamicMock<IAnnouncementService>();
+
+            announcementService.OnOnlineEvent += null;
+            LastCall.IgnoreArguments();
+
+            announcementService.OnOfflineEvent += null;
+            LastCall.IgnoreArguments();
+
+            announcementService.Expect(v => v.Start());
+
+            NodeAnnouncementService.AnnoucementService = announcementService;
+
+            var serviceHostHelper = Mocks.DynamicMock<IServiceHostHelper>();
+
+            serviceHostHelper.Expect(v => v.OpenServiceHost(null, null)).IgnoreArguments();
+
+            ServiceHostHelper.Helper = serviceHostHelper;
+
+            Mocks.ReplayAll();
+
+            Mocks.Ordered();
+
+            var listener = new NodeListener("JUNK");
+
+            listener.Start(null, null);
         }
 
         [Test]
@@ -78,23 +126,16 @@ namespace FatCatNode.Tests
             listener.Start(null, null);
         }
 
-        private void StubServiceHostHelper()
-        {
-            IServiceHostHelper serviceHostHelper = Mocks.Stub<IServiceHostHelper>();
-
-            ServiceHostHelper.Helper = serviceHostHelper;
-        }
-
         [Test]
         public void WhenListenerIsStartedAServiceHostIsOpened()
         {
-            INode mockNode = Mocks.DynamicMock<INode>();
+            var mockNode = Mocks.DynamicMock<INode>();
 
-            IServiceHostHelper serviceHostHelper = Mocks.DynamicMock<IServiceHostHelper>();
+            var serviceHostHelper = Mocks.DynamicMock<IServiceHostHelper>();
 
             StubAnnoucementService();
 
-            Uri baseAddress = new Uri("http://fatcatnode.com/Testing");
+            var baseAddress = new Uri("http://fatcatnode.com/Testing");
 
             serviceHostHelper.Expect(v => v.OpenServiceHost(mockNode, baseAddress));
 
@@ -102,16 +143,9 @@ namespace FatCatNode.Tests
 
             Mocks.ReplayAll();
 
-            NodeListener listener = new NodeListener("TestNodeId");
+            var listener = new NodeListener("TestNodeId");
 
             listener.Start(mockNode, baseAddress);
-        }
-
-        private void StubAnnoucementService()
-        {
-            IAnnouncementService announcementServiceStub = Mocks.Stub<IAnnouncementService>();
-
-            NodeAnnouncementService.AnnoucementService = announcementServiceStub;
         }
     }
 }
