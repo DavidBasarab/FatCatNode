@@ -23,6 +23,8 @@ namespace FatCatNode.Tests
 
             var node = new Node("UnitTestNode");
 
+            Assert.That(node.Id, Is.EqualTo("UnitTestNode"));
+
             mocks.VerifyAll();
         }
     }
