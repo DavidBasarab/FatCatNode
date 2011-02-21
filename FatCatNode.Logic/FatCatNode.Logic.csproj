@@ -42,10 +42,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AddressHelper.cs" />
     <Compile Include="Interfaces\IAddressHelper.cs" />
     <Compile Include="Interfaces\IAnnouncementService.cs" />
     <Compile Include="Interfaces\INode.cs" />
     <Compile Include="Interfaces\IServiceHostHelper.cs" />
+    <Compile Include="Node.cs" />
     <Compile Include="NodeAnnouncementService.cs" />
     <Compile Include="NodeListener.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
