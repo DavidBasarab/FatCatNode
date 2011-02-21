@@ -8,6 +8,14 @@ namespace FatCatNode.Tests
     [TestFixture]
     public class NodeTest
     {
+        public MockRepository MockRepository { get; set; }
+
+        [SetUp]
+        public void SetUp()
+        {
+            MockRepository = new MockRepository();
+        }
+
         [Test]
         public void OnCreationNodeWillInformTheAddressHelperOfTheNodeId()
         {
@@ -26,6 +34,12 @@ namespace FatCatNode.Tests
             Assert.That(node.Id, Is.EqualTo("UnitTestNode"));
 
             mocks.VerifyAll();
+        }
+
+        [Test]
+        public void NodeStartWillOpenAServiceHostConnection()
+        {
+            Assert.Fail();
         }
     }
 }

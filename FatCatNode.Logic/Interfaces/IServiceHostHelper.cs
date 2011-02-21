@@ -8,7 +8,5 @@ namespace FatCatNode.Logic.Interfaces
     public interface IServiceHostHelper
     {
         void OpenServiceHost(INode nodeInstance, Uri baseAddress);
-
-
     }
 }
