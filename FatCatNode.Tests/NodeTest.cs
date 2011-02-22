@@ -199,6 +199,8 @@ namespace FatCatNode.Tests
             announcementService.Raise(v => v.OnOnlineEvent += null, this, args);
 
             Mocks.ReplayAll();
+
+            Assert.Fail();
         }
     }
 }
