@@ -27,6 +27,8 @@ namespace FatCatNode.Tests
 
         #endregion
 
+        private const string NodeId = "UnitTestNode";
+
         private static void ResetHelpers()
         {
             AddressHelper.Helper = null;
@@ -40,7 +42,7 @@ namespace FatCatNode.Tests
         {
             var addressHelper = Mocks.DynamicMock<IAddressHelper>();
 
-            addressHelper.Expect(v => v.SetNodeId("UnitTestNode"));
+            addressHelper.Expect(v => v.SetNodeId(NodeId));
 
             var desiredBaseAddress = new Uri("http://10.30.55.55:7777/UnitTestNode/FatCatNode");
 
@@ -50,22 +52,34 @@ namespace FatCatNode.Tests
 
             AddressHelper.Helper = addressHelper;
 
-            var node = new Node("UnitTestNode");
+            var node = new Node(NodeId);
 
             Assert.That(node.BaseAddress, Is.EqualTo(desiredBaseAddress));
         }
 
         [Test]
-        [Ignore("Waiting on getting base Address set up on Node")]
         public void NodeStartWillOpenAServiceHostConnection()
         {
-            //IServiceHostHelper serviceHostHelper = Mocks.DynamicMock<IServiceHostHelper>();
+            var addressHelper = Mocks.DynamicMock<IAddressHelper>();
 
-            //serviceHostHelper.Expect(v => v.OpenServiceHost(node, node.BaseAddress));
+            addressHelper.Expect(v => v.FindBaseAddress()).Return(
+                new Uri("http://10.30.55.55:7777/UnitTestNode/FatCatNode"));
 
-            //ServiceHostHelper.Helper = serviceHostHelper;
+            AddressHelper.Helper = addressHelper;
 
-            Assert.Fail();
+            Mocks.ReplayAll();
+
+            var node = new Node(NodeId);
+
+            var serviceHostHelper = Mocks.DynamicMock<IServiceHostHelper>();
+
+            serviceHostHelper.Expect(v => v.OpenServiceHost(node, node.BaseAddress));
+
+            ServiceHostHelper.Helper = serviceHostHelper;
+
+            Mocks.ReplayAll();
+
+            node.Start();
         }
 
         [Test]
@@ -73,15 +87,15 @@ namespace FatCatNode.Tests
         {
             var addressHelper = Mocks.DynamicMock<IAddressHelper>();
 
-            addressHelper.Expect(v => v.SetNodeId("UnitTestNode"));
+            addressHelper.Expect(v => v.SetNodeId(NodeId));
 
             Mocks.ReplayAll();
 
             AddressHelper.Helper = addressHelper;
 
-            var node = new Node("UnitTestNode");
+            var node = new Node(NodeId);
 
-            Assert.That(node.Id, Is.EqualTo("UnitTestNode"));
+            Assert.That(node.Id, Is.EqualTo(NodeId));
         }
     }
 }

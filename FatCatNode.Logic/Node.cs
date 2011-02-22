@@ -1,10 +1,11 @@
 ﻿using System;
 using System.ServiceModel;
+using FatCatNode.Logic.Interfaces;
 
 namespace FatCatNode.Logic
 {
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single)]
-    public class Node
+    public class Node : INode
     {
         public Node(string nodeId)
         {
@@ -21,6 +22,11 @@ namespace FatCatNode.Logic
             {
                 return AddressHelper.Helper.FindBaseAddress();
             }
+        }
+
+        public void Start()
+        {
+            ServiceHostHelper.Helper.OpenServiceHost(this, BaseAddress);
         }
     }
 }
