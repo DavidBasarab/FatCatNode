@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ServiceModel.Discovery;
+using FatCatNode.Logic.Arguments;
 using FatCatNode.Logic.Interfaces;
 
 namespace FatCatNode.Logic
@@ -25,8 +26,8 @@ namespace FatCatNode.Logic
             throw new NotImplementedException();
         }
 
-        public event Action<object, AnnouncementEventArgs> OnOnlineEvent;
-        public event Action<object, AnnouncementEventArgs> OnOfflineEvent;
+        public event Action<object, NodeAnnoucementEventArgs> OnOnlineEvent;
+        public event Action<object, NodeAnnoucementEventArgs> OnOfflineEvent;
 
         private class Nested
         {

@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Net;
+using System.ServiceModel.Discovery;
 using FatCatNode.Logic;
+using FatCatNode.Logic.Arguments;
 using FatCatNode.Logic.Interfaces;
 using NUnit.Framework;
 using Rhino.Mocks;
@@ -38,6 +41,54 @@ namespace FatCatNode.Tests
 
         public MockRepository Mocks { get; set; }
 
+        [Flags]
+        private enum HelperFlags
+        {
+            None = 0,
+            ServiceHost = 1,
+            Address = 2,
+            Announcement = 4
+        }
+
+        private void StubHelpers(HelperFlags flag)
+        {
+            if (flag.IsSet(HelperFlags.ServiceHost))
+            {
+                StubServiceHostHelper();
+            }
+
+            if (flag.IsSet(HelperFlags.Address))
+            {
+                StubAddressHelper();
+            }
+
+            if (flag.IsSet(HelperFlags.Announcement))
+            {
+                StubAnnoucementService();
+            }
+        }
+
+        private void StubAddressHelper()
+        {
+            var addressHelper = Mocks.Stub<IAddressHelper>();
+
+            AddressHelper.Helper = addressHelper;
+        }
+
+        private void StubServiceHostHelper()
+        {
+            var serviceHostStub = Mocks.Stub<IServiceHostHelper>();
+
+            ServiceHostHelper.Helper = serviceHostStub;
+        }
+
+        private void StubAnnoucementService()
+        {
+            var announcementService = Mocks.Stub<IAnnouncementService>();
+
+            NodeAnnouncementService.AnnoucementService = announcementService;
+        }
+
         [Test]
         public void BaseAddressWillBeCalculatedFromTheAddressHelper()
         {
@@ -59,13 +110,38 @@ namespace FatCatNode.Tests
         }
 
         [Test]
+        public void NodeStartWillAnnouceTheService()
+        {
+            StubHelpers(HelperFlags.ServiceHost | HelperFlags.Address);
+
+            var announcementService = Mocks.DynamicMock<IAnnouncementService>();
+
+            announcementService.OnOnlineEvent += null;
+            LastCall.IgnoreArguments();
+
+            announcementService.OnOfflineEvent += null;
+            LastCall.IgnoreArguments();
+
+            announcementService.Expect(v => v.Start());
+
+            NodeAnnouncementService.AnnoucementService = announcementService;
+
+            Mocks.ReplayAll();
+
+            var node = new Node(NodeId);
+
+            node.Start();
+        }
+
+        [Test]
         public void NodeStartWillOpenAServiceHostConnection()
         {
             StubHelpers(HelperFlags.Announcement);
 
             var addressHelper = Mocks.DynamicMock<IAddressHelper>();
 
-            addressHelper.Expect(v => v.FindBaseAddress()).Return(new Uri("http://10.30.55.55:7777/UnitTestNode/FatCatNode"));
+            addressHelper.Expect(v => v.FindBaseAddress()).Return(
+                new Uri("http://10.30.55.55:7777/UnitTestNode/FatCatNode"));
 
             AddressHelper.Helper = addressHelper;
 
@@ -101,75 +177,28 @@ namespace FatCatNode.Tests
         }
 
         [Test]
-        public void NodeStartWillAnnouceTheService()
+        public void TempEventRaiserTester()
         {
             StubHelpers(HelperFlags.ServiceHost | HelperFlags.Address);
 
-            var announcementService = Mocks.DynamicMock<IAnnouncementService>();
-
-            announcementService.OnOnlineEvent += null;
-            LastCall.IgnoreArguments();
-
-            announcementService.OnOfflineEvent += null;
-            LastCall.IgnoreArguments();
-
-            announcementService.Expect(v => v.Start());
+            IAnnouncementService announcementService = Mocks.DynamicMock<IAnnouncementService>();
 
             NodeAnnouncementService.AnnoucementService = announcementService;
+
+            NodeAnnoucementEventArgs args = new NodeAnnoucementEventArgs()
+                                            {
+                                                Address = IPAddress.Parse("127.0.0.1")
+                                            };
 
             Mocks.ReplayAll();
 
-            var node = new Node(NodeId);
+            Node node = new Node(NodeId);
 
             node.Start();
-        }
 
-        [Flags]
-        private enum HelperFlags
-        {
-            None = 0,
-            ServiceHost = 1,
-            Address = 2,
-            Announcement = 4
-        }
+            announcementService.Raise(v => v.OnOnlineEvent += null, this, args);
 
-        private void StubHelpers(HelperFlags flag)
-        {
-            if (flag.IsSet(HelperFlags.ServiceHost))
-            {
-                StubServiceHostHelper();
-            }
-
-            if (flag.IsSet(HelperFlags.Address))
-            {
-                StubAddressHelper();
-            }
-
-            if (flag.IsSet(HelperFlags.Announcement))
-            {
-                StubAnnoucementService();
-            }
-        }
-
-        private void StubAddressHelper()
-        {
-            IAddressHelper addressHelper = Mocks.Stub<IAddressHelper>();
-
-            AddressHelper.Helper = addressHelper;
-        }
-
-        private void StubServiceHostHelper()
-        {
-            IServiceHostHelper serviceHostStub = Mocks.Stub<IServiceHostHelper>();
-
-            ServiceHostHelper.Helper = serviceHostStub;
-        }
-
-        private void StubAnnoucementService()
-        {
-            IAnnouncementService announcementService = Mocks.Stub<IAnnouncementService>();
-
-            NodeAnnouncementService.AnnoucementService = announcementService;
+            Mocks.ReplayAll();
         }
     }
 }

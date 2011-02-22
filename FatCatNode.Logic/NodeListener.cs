@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ServiceModel.Discovery;
+using FatCatNode.Logic.Arguments;
 using FatCatNode.Logic.Interfaces;
 
 namespace FatCatNode.Logic
@@ -28,11 +29,11 @@ namespace FatCatNode.Logic
             NodeAnnouncementService.AnnoucementService.OnOfflineEvent += OnOfflineEvent;
         }
 
-        private void OnOnlineEvent(object sender, AnnouncementEventArgs e)
+        private void OnOnlineEvent(object sender, NodeAnnoucementEventArgs e)
         {
         }
 
-        private void OnOfflineEvent(object sender, AnnouncementEventArgs e)
+        private void OnOfflineEvent(object sender, NodeAnnoucementEventArgs e)
         {
         }
     }

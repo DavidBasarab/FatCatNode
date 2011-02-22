@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ServiceModel;
 using System.ServiceModel.Discovery;
+using FatCatNode.Logic.Arguments;
 using FatCatNode.Logic.Interfaces;
 
 namespace FatCatNode.Logic
@@ -11,15 +12,7 @@ namespace FatCatNode.Logic
         public Node(string nodeId)
         {
             SetNodeId(nodeId);
-
             RegisterForOfflineAndOnLineEvents();
-        }
-
-        private void SetNodeId(string nodeId)
-        {
-            Id = nodeId;
-
-            AddressHelper.Helper.SetNodeId(nodeId);
         }
 
         public string Id { get; set; }
@@ -32,11 +25,27 @@ namespace FatCatNode.Logic
             }
         }
 
+        private void SetNodeId(string nodeId)
+        {
+            Id = nodeId;
+
+            AddressHelper.Helper.SetNodeId(nodeId);
+        }
+
         public void Start()
         {
-            NodeAnnouncementService.AnnoucementService.Start();
+            MakeServiceAnnoucement();
+            OpenServiceHost();
+        }
 
+        private void OpenServiceHost()
+        {
             ServiceHostHelper.Helper.OpenServiceHost(this, BaseAddress);
+        }
+
+        private static void MakeServiceAnnoucement()
+        {
+            NodeAnnouncementService.AnnoucementService.Start();
         }
 
         private void RegisterForOfflineAndOnLineEvents()
@@ -45,11 +54,11 @@ namespace FatCatNode.Logic
             NodeAnnouncementService.AnnoucementService.OnOfflineEvent += OnOfflineEvent;
         }
 
-        private void OnOnlineEvent(object sender, AnnouncementEventArgs e)
+        private void OnOnlineEvent(object sender, NodeAnnoucementEventArgs e)
         {
         }
 
-        private void OnOfflineEvent(object sender, AnnouncementEventArgs e)
+        private void OnOfflineEvent(object sender, NodeAnnoucementEventArgs e)
         {
         }
     }

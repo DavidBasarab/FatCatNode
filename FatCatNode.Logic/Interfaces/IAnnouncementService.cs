@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.ServiceModel.Discovery;
 using System.Text;
+using FatCatNode.Logic.Arguments;
 
 namespace FatCatNode.Logic.Interfaces
 {
@@ -10,7 +11,7 @@ namespace FatCatNode.Logic.Interfaces
     {
         void Start();
 
-        event Action<object, AnnouncementEventArgs> OnOnlineEvent;
-        event Action<object, AnnouncementEventArgs> OnOfflineEvent;
+        event Action<object, NodeAnnoucementEventArgs> OnOnlineEvent;
+        event Action<object, NodeAnnoucementEventArgs> OnOfflineEvent;
     }
 }

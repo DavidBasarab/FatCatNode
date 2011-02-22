@@ -43,6 +43,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AddressHelper.cs" />
+    <Compile Include="Arguments\NodeAnnoucementEventArgs.cs" />
     <Compile Include="Interfaces\IAddressHelper.cs" />
     <Compile Include="Interfaces\IAnnouncementService.cs" />
     <Compile Include="Interfaces\INode.cs" />
