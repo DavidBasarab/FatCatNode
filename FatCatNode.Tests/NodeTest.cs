@@ -33,6 +33,7 @@ namespace FatCatNode.Tests
         {
             AddressHelper.Helper = null;
             ServiceHostHelper.Helper = null;
+            NodeAnnouncementService.AnnoucementService = null;
         }
 
         public MockRepository Mocks { get; set; }
@@ -60,10 +61,11 @@ namespace FatCatNode.Tests
         [Test]
         public void NodeStartWillOpenAServiceHostConnection()
         {
+            StubHelpers(HelperFlags.Announcement);
+
             var addressHelper = Mocks.DynamicMock<IAddressHelper>();
 
-            addressHelper.Expect(v => v.FindBaseAddress()).Return(
-                new Uri("http://10.30.55.55:7777/UnitTestNode/FatCatNode"));
+            addressHelper.Expect(v => v.FindBaseAddress()).Return(new Uri("http://10.30.55.55:7777/UnitTestNode/FatCatNode"));
 
             AddressHelper.Helper = addressHelper;
 
@@ -96,6 +98,78 @@ namespace FatCatNode.Tests
             var node = new Node(NodeId);
 
             Assert.That(node.Id, Is.EqualTo(NodeId));
+        }
+
+        [Test]
+        public void NodeStartWillAnnouceTheService()
+        {
+            StubHelpers(HelperFlags.ServiceHost | HelperFlags.Address);
+
+            var announcementService = Mocks.DynamicMock<IAnnouncementService>();
+
+            announcementService.OnOnlineEvent += null;
+            LastCall.IgnoreArguments();
+
+            announcementService.OnOfflineEvent += null;
+            LastCall.IgnoreArguments();
+
+            announcementService.Expect(v => v.Start());
+
+            NodeAnnouncementService.AnnoucementService = announcementService;
+
+            Mocks.ReplayAll();
+
+            var node = new Node(NodeId);
+
+            node.Start();
+        }
+
+        [Flags]
+        private enum HelperFlags
+        {
+            None = 0,
+            ServiceHost = 1,
+            Address = 2,
+            Announcement = 4
+        }
+
+        private void StubHelpers(HelperFlags flag)
+        {
+            if (flag.IsSet(HelperFlags.ServiceHost))
+            {
+                StubServiceHostHelper();
+            }
+
+            if (flag.IsSet(HelperFlags.Address))
+            {
+                StubAddressHelper();
+            }
+
+            if (flag.IsSet(HelperFlags.Announcement))
+            {
+                StubAnnoucementService();
+            }
+        }
+
+        private void StubAddressHelper()
+        {
+            IAddressHelper addressHelper = Mocks.Stub<IAddressHelper>();
+
+            AddressHelper.Helper = addressHelper;
+        }
+
+        private void StubServiceHostHelper()
+        {
+            IServiceHostHelper serviceHostStub = Mocks.Stub<IServiceHostHelper>();
+
+            ServiceHostHelper.Helper = serviceHostStub;
+        }
+
+        private void StubAnnoucementService()
+        {
+            IAnnouncementService announcementService = Mocks.Stub<IAnnouncementService>();
+
+            NodeAnnouncementService.AnnoucementService = announcementService;
         }
     }
 }
