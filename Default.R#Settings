@@ -1,3 +1,502 @@
 <Configuration>
   <SharingSettings Version="1.0" AutoUpdateCommonSettings="False" ExternalSettingsFilePath="..\Default.R#Settings" />
+  <ResharperSettings>
+    <CodeAnnotations />
+    <CodeStyleSettings>
+      <CSharp>
+        <FormatSettings>
+          <FORCE_FIXED_BRACES_STYLE>ALWAYS_ADD</FORCE_FIXED_BRACES_STYLE>
+          <FORCE_FOR_BRACES_STYLE>ALWAYS_ADD</FORCE_FOR_BRACES_STYLE>
+          <FORCE_FOREACH_BRACES_STYLE>ALWAYS_ADD</FORCE_FOREACH_BRACES_STYLE>
+          <FORCE_IFELSE_BRACES_STYLE>ALWAYS_ADD</FORCE_IFELSE_BRACES_STYLE>
+          <FORCE_USING_BRACES_STYLE>ALWAYS_ADD</FORCE_USING_BRACES_STYLE>
+          <FORCE_WHILE_BRACES_STYLE>ALWAYS_ADD</FORCE_WHILE_BRACES_STYLE>
+          <KEEP_BLANK_LINES_IN_CODE>1</KEEP_BLANK_LINES_IN_CODE>
+          <KEEP_BLANK_LINES_IN_DECLARATIONS>1</KEEP_BLANK_LINES_IN_DECLARATIONS>
+          <MODIFIERS_ORDER IsNull="False">
+            <Item>public</Item>
+            <Item>protected</Item>
+            <Item>internal</Item>
+            <Item>private</Item>
+            <Item>new</Item>
+            <Item>abstract</Item>
+            <Item>virtual</Item>
+            <Item>override</Item>
+            <Item>sealed</Item>
+            <Item>static</Item>
+            <Item>readonly</Item>
+            <Item>extern</Item>
+            <Item>unsafe</Item>
+            <Item>volatile</Item>
+          </MODIFIERS_ORDER>
+        </FormatSettings>
+        <UsingsSettings />
+        <Naming2>
+          <EventHandlerPatternLong>$object$_On$event$</EventHandlerPatternLong>
+          <EventHandlerPatternShort>$event$Handler</EventHandlerPatternShort>
+        </Naming2>
+        <CustomMemberReorderingPatterns><![CDATA[<?xml version="1.0" encoding="utf-8" ?>
+
+<!--
+I. Overall
+
+I.1 Each pattern can have <Match>....</Match> element. For the given type declaration, the pattern with the match, evaluated to 'true' with the largest weight, will be used 
+I.2 Each pattern consists of the sequence of <Entry>...</Entry> elements. Type member declarations are distributed between entries
+I.3 If pattern has RemoveAllRegions="true" attribute, then all regions will be cleared prior to reordering. Otherwise, only auto-generated regions will be cleared
+I.4 The contents of each entry is sorted by given keys (First key is primary,  next key is secondary, etc). Then the declarations are grouped and en-regioned by given property
+
+II. Available match operands
+
+Each operand may have Weight="..." attribute. This weight will be added to the match weight if the operand is evaluated to 'true'.
+The default weight is 1
+
+II.1 Boolean functions:
+II.1.1 <And>....</And>
+II.1.2 <Or>....</Or>
+II.1.3 <Not>....</Not>
+
+II.2 Operands
+II.2.1 <Kind Is="..."/>. Kinds are: class, struct, interface, enum, delegate, type, constructor, destructor, property, indexer, method, operator, field, constant, event, member
+II.2.2 <Name Is="..." [IgnoreCase="true/false"] />. The 'Is' attribute contains regular expression
+II.2.3 <HasAttribute CLRName="..." [Inherit="true/false"] />. The 'CLRName' attribute contains regular expression
+II.2.4 <Access Is="..."/>. The 'Is' values are: public, protected, internal, protected internal, private
+II.2.5 <Static/>
+II.2.6 <Abstract/>
+II.2.7 <Virtual/>
+II.2.8 <Override/>
+II.2.9 <Sealed/>
+II.2.10 <Readonly/>
+II.2.11 <ImplementsInterface CLRName="..."/>. The 'CLRName' attribute contains regular expression
+II.2.12 <HandlesEvent />
+-->
+
+<Patterns xmlns="urn:shemas-jetbrains-com:member-reordering-patterns">
+
+  <!--Do not reorder COM interfaces and structs marked by StructLayout attribute-->
+  <Pattern>
+    <Match>
+      <Or Weight="100">
+        <And>
+          <Kind Is="interface"/>
+          <Or>
+            <HasAttribute CLRName="System.Runtime.InteropServices.InterfaceTypeAttribute"/>
+            <HasAttribute CLRName="System.Runtime.InteropServices.ComImport"/>
+          </Or>
+        </And>
+        <HasAttribute CLRName="System.Runtime.InteropServices.StructLayoutAttribute"/>
+      </Or>
+    </Match>
+  </Pattern>
+
+  <!--Special formatting of NUnit test fixture-->
+  <Pattern RemoveAllRegions="true">
+    <Match>
+      <And Weight="100">
+        <Kind Is="class"/>
+        <HasAttribute CLRName="NUnit.Framework.TestFixtureAttribute" Inherit="true"/>
+      </And>
+    </Match>
+
+    <!--Setup/Teardow-->
+    <Entry>
+      <Match>
+        <And>
+          <Kind Is="method"/>
+          <Or>
+            <HasAttribute CLRName="NUnit.Framework.SetUpAttribute" Inherit="true"/>
+            <HasAttribute CLRName="NUnit.Framework.TearDownAttribute" Inherit="true"/>
+            <HasAttribute CLRName="NUnit.Framework.FixtureSetUpAttribute" Inherit="true"/>
+            <HasAttribute CLRName="NUnit.Framework.FixtureTearDownAttribute" Inherit="true"/>
+          </Or>
+        </And>
+      </Match>
+      <Group Region="Setup/Teardown"/>
+    </Entry>
+    
+    <!--All other members-->
+    <Entry/>
+    
+    <!--Test methods-->
+    <Entry>
+      <Match>
+        <And Weight="100">
+          <Kind Is="method"/>
+          <HasAttribute CLRName="NUnit.Framework.TestAttribute" Inherit="false"/>
+        </And>
+      </Match>
+      <Sort>
+        <Name/>
+      </Sort>
+    </Entry>
+  </Pattern>
+
+  <!--Default pattern-->
+  <Pattern>
+
+    <!--public delegate-->
+    <Entry>
+      <Match>
+        <And Weight="100">
+          <Access Is="public"/>
+          <Kind Is="delegate"/>
+        </And>
+      </Match>
+      <Sort>
+        <Name/>
+      </Sort>
+      <Group Region="Delegates"/>
+    </Entry>
+    
+    <!--public enum-->
+    <Entry>
+      <Match>
+        <And Weight="100">
+          <Access Is="public"/>
+          <Kind Is="enum"/>
+        </And>
+      </Match>
+      <Sort>
+        <Name/>
+      </Sort>
+      <Group>
+        <Name Region="${Name} enum"/>
+      </Group>
+    </Entry>
+
+    <!--static fields and constants-->
+    <Entry>
+      <Match>
+        <Or>
+          <Kind Is="constant"/>
+          <And>
+            <Kind Is="field"/>
+            <Static/>
+          </And>
+        </Or>
+      </Match>
+      <Sort>
+        <Kind Order="constant field"/>
+      </Sort>
+    </Entry>
+    
+    <!--instance fields-->
+    <Entry>
+      <Match>
+        <And>
+          <Kind Is="field"/>
+          <Not>
+            <Static/>
+          </Not>
+        </And>
+      </Match>
+      <Sort>
+        <Readonly/>
+        <Name/>
+      </Sort>
+    </Entry>
+
+    <!--Constructors. Place static one first-->
+    <Entry>
+      <Match>
+        <Kind Is="constructor"/>
+      </Match>
+      <Sort>
+        <Static/>
+      </Sort>
+    </Entry>
+    
+    <!--properties, indexers-->
+    <Entry>
+      <Match>
+        <Or>
+          <Kind Is="property"/>
+          <Kind Is="indexer"/>
+        </Or>
+      </Match>
+    </Entry>
+    
+    <!--interface implementations-->
+    <Entry>
+      <Match>
+        <And Weight="100">
+          <Kind Is="member"/>
+          <ImplementsInterface/>
+        </And>
+      </Match>
+      <Sort>
+        <ImplementsInterface Immediate="true"/>
+      </Sort>
+    </Entry>
+    
+    <!--all other members-->
+    <Entry/>
+    
+    <!--nested types-->
+    <Entry>
+      <Match>
+        <Kind Is="type"/>
+      </Match>
+      <Sort>
+        <Name/>
+      </Sort>
+    </Entry>
+  </Pattern>
+  
+</Patterns>
+]]></CustomMemberReorderingPatterns>
+      </CSharp>
+      <VB>
+        <FormatSettings />
+        <ImportsSettings />
+        <Naming2>
+          <EventHandlerPatternLong>$object$_On$event$</EventHandlerPatternLong>
+          <EventHandlerPatternShort>$event$Handler</EventHandlerPatternShort>
+        </Naming2>
+      </VB>
+      <Web>
+        <Naming2 />
+      </Web>
+      <Xaml>
+        <Naming2 />
+      </Xaml>
+      <XML>
+        <FormatSettings />
+      </XML>
+      <GenerateMemberBody />
+      <Naming2>
+        <EventHandlerPatternLong>$object$_On$event$</EventHandlerPatternLong>
+        <EventHandlerPatternShort>$event$Handler</EventHandlerPatternShort>
+        <PredefinedRule Inspect="True" Prefix="" Suffix="" Style="AaBb" ElementKind="TypesAndNamespaces" />
+        <PredefinedRule Inspect="True" Prefix="I" Suffix="" Style="AaBb" ElementKind="Interfaces" />
+        <PredefinedRule Inspect="True" Prefix="T" Suffix="" Style="AaBb" ElementKind="TypeParameters" />
+        <PredefinedRule Inspect="True" Prefix="" Suffix="" Style="AaBb" ElementKind="MethodPropertyEvent" />
+        <PredefinedRule Inspect="True" Prefix="" Suffix="" Style="aaBb" ElementKind="Locals" />
+        <PredefinedRule Inspect="True" Prefix="" Suffix="" Style="aaBb" ElementKind="LocalConstants" />
+        <PredefinedRule Inspect="True" Prefix="" Suffix="" Style="aaBb" ElementKind="Parameters" />
+        <PredefinedRule Inspect="True" Prefix="" Suffix="" Style="AaBb" ElementKind="PublicFields" />
+        <PredefinedRule Inspect="True" Prefix="_" Suffix="" Style="aaBb" ElementKind="PrivateInstanceFields" />
+        <PredefinedRule Inspect="True" Prefix="_" Suffix="" Style="aaBb" ElementKind="PrivateStaticFields" />
+        <PredefinedRule Inspect="True" Prefix="" Suffix="" Style="AaBb" ElementKind="Constants" />
+        <PredefinedRule Inspect="True" Prefix="" Suffix="" Style="AaBb" ElementKind="PrivateConstants" />
+        <PredefinedRule Inspect="True" Prefix="" Suffix="" Style="AaBb" ElementKind="StaticReadonly" />
+        <PredefinedRule Inspect="True" Prefix="" Suffix="" Style="AaBb" ElementKind="PrivateStaticReadonly" />
+        <PredefinedRule Inspect="True" Prefix="" Suffix="" Style="AaBb" ElementKind="EnumMember" />
+        <PredefinedRule Inspect="True" Prefix="" Suffix="" Style="AaBb" ElementKind="Other" />
+      </Naming2>
+    </CodeStyleSettings>
+    <HighlightingSettings>
+      <SeverityTable>
+        <CheckNamespace>WARNING</CheckNamespace>
+        <Asp.Entity>WARNING</Asp.Entity>
+        <Asp.Image>WARNING</Asp.Image>
+        <Asp.NotResolved>ERROR</Asp.NotResolved>
+        <Asp.PathError>WARNING</Asp.PathError>
+        <Asp.TagAttributeWithOptionalValue>WARNING</Asp.TagAttributeWithOptionalValue>
+        <Xaml.RedundanNamespaceAlias>WARNING</Xaml.RedundanNamespaceAlias>
+        <Xaml.RedundanResource>WARNING</Xaml.RedundanResource>
+        <Xaml.LanguageLevel>ERROR</Xaml.LanguageLevel>
+        <UnknownProperty>WARNING</UnknownProperty>
+        <UnknownTarget>WARNING</UnknownTarget>
+        <UnknownItemGroup>WARNING</UnknownItemGroup>
+        <UnknownTask>WARNING</UnknownTask>
+        <UnknownTaskElement>WARNING</UnknownTaskElement>
+        <LoopCanBeConvertedToQuery>SUGGESTION</LoopCanBeConvertedToQuery>
+        <LoopCanBePartlyConvertedToQuery>HINT</LoopCanBePartlyConvertedToQuery>
+        <ForCanBeConvertedToForeach>SUGGESTION</ForCanBeConvertedToForeach>
+        <UnusedType.Local>WARNING</UnusedType.Local>
+        <UnusedType.Global>SUGGESTION</UnusedType.Global>
+        <UnusedMember.Local>WARNING</UnusedMember.Local>
+        <UnusedMember.Global>SUGGESTION</UnusedMember.Global>
+        <UnusedMemberInSuper.Local>WARNING</UnusedMemberInSuper.Local>
+        <UnusedMemberInSuper.Global>SUGGESTION</UnusedMemberInSuper.Global>
+        <UnusedMemberHiearchy.Local>WARNING</UnusedMemberHiearchy.Local>
+        <UnusedMemberHiearchy.Global>SUGGESTION</UnusedMemberHiearchy.Global>
+        <RedundantBaseConstructorCall>WARNING</RedundantBaseConstructorCall>
+        <EmptyConstructor>WARNING</EmptyConstructor>
+        <EmptyDestructor>WARNING</EmptyDestructor>
+        <RedundantOverridenMember>WARNING</RedundantOverridenMember>
+        <EmptyNamespace>WARNING</EmptyNamespace>
+        <SealedMemberInSealedClass>WARNING</SealedMemberInSealedClass>
+        <RedundantExtendsListEntry>WARNING</RedundantExtendsListEntry>
+        <PartialTypeWithSinglePart>WARNING</PartialTypeWithSinglePart>
+        <PartialMethodWithSinglePart>WARNING</PartialMethodWithSinglePart>
+        <EnumUnderlyingTypeIsInt>WARNING</EnumUnderlyingTypeIsInt>
+        <RedundantDefaultFieldInitializer>WARNING</RedundantDefaultFieldInitializer>
+        <RedundantParams>WARNING</RedundantParams>
+        <UnusedMethodReturnValue.Local>WARNING</UnusedMethodReturnValue.Local>
+        <UnusedMethodReturnValue.Global>SUGGESTION</UnusedMethodReturnValue.Global>
+        <UnusedParameter.Local>WARNING</UnusedParameter.Local>
+        <UnusedParameter.Global>SUGGESTION</UnusedParameter.Global>
+        <UnusedTypeParameter>WARNING</UnusedTypeParameter>
+        <VirtualMemberNeverOverriden.Local>SUGGESTION</VirtualMemberNeverOverriden.Local>
+        <VirtualMemberNeverOverriden.Global>SUGGESTION</VirtualMemberNeverOverriden.Global>
+        <ClassWithVirtualMembersNeverInherited.Local>SUGGESTION</ClassWithVirtualMembersNeverInherited.Local>
+        <ClassWithVirtualMembersNeverInherited.Global>SUGGESTION</ClassWithVirtualMembersNeverInherited.Global>
+        <RedundantOverload.Local>SUGGESTION</RedundantOverload.Local>
+        <RedundantOverload.Global>SUGGESTION</RedundantOverload.Global>
+        <SuggestUseVarKeywordEverywhere>HINT</SuggestUseVarKeywordEverywhere>
+        <SuggestUseVarKeywordEvident>SUGGESTION</SuggestUseVarKeywordEvident>
+        <UseObjectOrCollectionInitializer>SUGGESTION</UseObjectOrCollectionInitializer>
+        <InvokeAsExtensionMethod>SUGGESTION</InvokeAsExtensionMethod>
+        <ConvertToAutoProperty>SUGGESTION</ConvertToAutoProperty>
+        <ConvertToAutoPropertyWithPrivateSetter>HINT</ConvertToAutoPropertyWithPrivateSetter>
+        <ConvertNullableToShortForm>SUGGESTION</ConvertNullableToShortForm>
+        <ConvertIfStatementToNullCoalescingExpression>SUGGESTION</ConvertIfStatementToNullCoalescingExpression>
+        <ConvertIfStatementToConditionalTernaryExpression>SUGGESTION</ConvertIfStatementToConditionalTernaryExpression>
+        <ConvertIfStatementToReturnStatement>HINT</ConvertIfStatementToReturnStatement>
+        <ConvertConditionalTernaryToNullCoalescing>SUGGESTION</ConvertConditionalTernaryToNullCoalescing>
+        <InvertIf>HINT</InvertIf>
+        <ConvertIfStatementToSwitchStatement>HINT</ConvertIfStatementToSwitchStatement>
+        <ConvertToStaticClass>SUGGESTION</ConvertToStaticClass>
+        <ConvertToLambdaExpression>SUGGESTION</ConvertToLambdaExpression>
+        <ConvertClosureToMethodGroup>SUGGESTION</ConvertClosureToMethodGroup>
+        <IntroduceOptionalParameters.Local>SUGGESTION</IntroduceOptionalParameters.Local>
+        <IntroduceOptionalParameters.Global>SUGGESTION</IntroduceOptionalParameters.Global>
+        <MethodGroupOfStruct>SUGGESTION</MethodGroupOfStruct>
+        <MethodGroupOfInterface>SUGGESTION</MethodGroupOfInterface>
+        <TooWideLocalVariableScope>SUGGESTION</TooWideLocalVariableScope>
+        <MoreSpecificForeachVariableTypeAvailable>SUGGESTION</MoreSpecificForeachVariableTypeAvailable>
+        <PublicConstructorInAbstractClass>SUGGESTION</PublicConstructorInAbstractClass>
+        <ReplaceWithStringIsNullOrEmpty>SUGGESTION</ReplaceWithStringIsNullOrEmpty>
+        <TypeParameterCanBeVariant>SUGGESTION</TypeParameterCanBeVariant>
+        <JoinDeclarationAndInitializer>SUGGESTION</JoinDeclarationAndInitializer>
+        <AccessToStaticMemberViaDerivedType>WARNING</AccessToStaticMemberViaDerivedType>
+        <BaseMemberHasParams>WARNING</BaseMemberHasParams>
+        <MemberCanBePrivate.Local>SUGGESTION</MemberCanBePrivate.Local>
+        <MemberCanBePrivate.Global>SUGGESTION</MemberCanBePrivate.Global>
+        <MemberCanBeProtected.Local>SUGGESTION</MemberCanBeProtected.Local>
+        <MemberCanBeProtected.Global>SUGGESTION</MemberCanBeProtected.Global>
+        <MemberCanBeInternal>DO_NOT_SHOW</MemberCanBeInternal>
+        <ConvertToConstant.Local>SUGGESTION</ConvertToConstant.Local>
+        <ConvertToConstant.Global>SUGGESTION</ConvertToConstant.Global>
+        <FieldCanBeMadeReadOnly.Local>SUGGESTION</FieldCanBeMadeReadOnly.Local>
+        <FieldCanBeMadeReadOnly.Global>SUGGESTION</FieldCanBeMadeReadOnly.Global>
+        <SuggestBaseTypeForParameter>HINT</SuggestBaseTypeForParameter>
+        <ParameterTypeCanBeEnumerable.Local>SUGGESTION</ParameterTypeCanBeEnumerable.Local>
+        <ParameterTypeCanBeEnumerable.Global>SUGGESTION</ParameterTypeCanBeEnumerable.Global>
+        <ReturnTypeCanBeEnumerable.Local>SUGGESTION</ReturnTypeCanBeEnumerable.Local>
+        <ReturnTypeCanBeEnumerable.Global>SUGGESTION</ReturnTypeCanBeEnumerable.Global>
+        <MemberCanBeMadeStatic.Local>SUGGESTION</MemberCanBeMadeStatic.Local>
+        <MemberCanBeMadeStatic.Global>SUGGESTION</MemberCanBeMadeStatic.Global>
+        <RedundantUsingDirective>WARNING</RedundantUsingDirective>
+        <ClassCanBeSealed.Local>DO_NOT_SHOW</ClassCanBeSealed.Local>
+        <ClassCanBeSealed.Global>DO_NOT_SHOW</ClassCanBeSealed.Global>
+        <NegativeEqualityExpression>SUGGESTION</NegativeEqualityExpression>
+        <UseIndexedProperty>SUGGESTION</UseIndexedProperty>
+        <PossibleNullReferenceException>WARNING</PossibleNullReferenceException>
+        <PossibleInvalidOperationException>WARNING</PossibleInvalidOperationException>
+        <PossibleInvalidCastException>WARNING</PossibleInvalidCastException>
+        <SimilarAnonymousTypeNearby>HINT</SimilarAnonymousTypeNearby>
+        <FunctionNeverReturns>WARNING</FunctionNeverReturns>
+        <LocalVariableHidesMember>WARNING</LocalVariableHidesMember>
+        <EmptyGeneralCatchClause>WARNING</EmptyGeneralCatchClause>
+        <ParameterHidesMember>WARNING</ParameterHidesMember>
+        <ValueParameterNotUsed>WARNING</ValueParameterNotUsed>
+        <DoNotCallOverridableMethodsInConstructor>WARNING</DoNotCallOverridableMethodsInConstructor>
+        <PossibleIntendedRethrow>WARNING</PossibleIntendedRethrow>
+        <FormatStringProblem>WARNING</FormatStringProblem>
+        <ReferenceEqualsWithValueType>WARNING</ReferenceEqualsWithValueType>
+        <CompareNonConstrainedGenericWithNull>WARNING</CompareNonConstrainedGenericWithNull>
+        <AccessToModifiedClosure>WARNING</AccessToModifiedClosure>
+        <PossibleInterfaceMemberAmbiguity>WARNING</PossibleInterfaceMemberAmbiguity>
+        <BitwiseOperatorOnEnumWihtoutFlags>WARNING</BitwiseOperatorOnEnumWihtoutFlags>
+        <PossibleLossOfFraction>WARNING</PossibleLossOfFraction>
+        <ConstructorInitializerLoop>WARNING</ConstructorInitializerLoop>
+        <OptionalParameterHierarchyMismatch>WARNING</OptionalParameterHierarchyMismatch>
+        <ClassNeverInstantiated.Local>SUGGESTION</ClassNeverInstantiated.Local>
+        <ClassNeverInstantiated.Global>SUGGESTION</ClassNeverInstantiated.Global>
+        <UnaccessedField.Local>WARNING</UnaccessedField.Local>
+        <UnaccessedField.Global>SUGGESTION</UnaccessedField.Global>
+        <EventNeverSubscribedTo.Local>SUGGESTION</EventNeverSubscribedTo.Local>
+        <EventNeverSubscribedTo.Global>SUGGESTION</EventNeverSubscribedTo.Global>
+        <UnassignedField.Global>SUGGESTION</UnassignedField.Global>
+        <UnusedAutoPropertyAccessor.Local>WARNING</UnusedAutoPropertyAccessor.Local>
+        <UnusedAutoPropertyAccessor.Global>WARNING</UnusedAutoPropertyAccessor.Global>
+        <EventNeverInvoked.Global>SUGGESTION</EventNeverInvoked.Global>
+        <SuspiciousTypeConversion.Global>SUGGESTION</SuspiciousTypeConversion.Global>
+        <CompareWithNaN>WARNING</CompareWithNaN>
+        <PossibleAssignmentToReadonlyField>WARNING</PossibleAssignmentToReadonlyField>
+        <StaticFieldInitializersReferesToFieldBelow>WARNING</StaticFieldInitializersReferesToFieldBelow>
+        <EventUnsubscriptionViaAnonimousDelegate>WARNING</EventUnsubscriptionViaAnonimousDelegate>
+        <ForControlVariableIsNeverModified>WARNING</ForControlVariableIsNeverModified>
+        <EqualExpressionComparison>WARNING</EqualExpressionComparison>
+        <ConditionalTernaryEqualBranch>WARNING</ConditionalTernaryEqualBranch>
+        <PolymorphicFieldLikeEventInvocation>WARNING</PolymorphicFieldLikeEventInvocation>
+        <MemberHidesStaticFromOuterClass>WARNING</MemberHidesStaticFromOuterClass>
+        <PartialMethodParameterNameMismatch>WARNING</PartialMethodParameterNameMismatch>
+        <DynamicShiftRightOpIsNotInt>WARNING</DynamicShiftRightOpIsNotInt>
+        <AssignNullToNotNullAttribute>WARNING</AssignNullToNotNullAttribute>
+        <CannotApplyEqualityOperatorToType>WARNING</CannotApplyEqualityOperatorToType>
+        <InconsistentNaming>WARNING</InconsistentNaming>
+        <RequiredBaseTypesIsNotInherited>WARNING</RequiredBaseTypesIsNotInherited>
+        <UnsupportedRequiredBaseType>WARNING</UnsupportedRequiredBaseType>
+        <RequiredBaseTypesDirectConflict>WARNING</RequiredBaseTypesDirectConflict>
+        <RequiredBaseTypesConflict>WARNING</RequiredBaseTypesConflict>
+        <ConditionIsAlwaysTrueOrFalse>WARNING</ConditionIsAlwaysTrueOrFalse>
+        <ConstantNullCoalescingCondition>WARNING</ConstantNullCoalescingCondition>
+        <RedundantBoolCompare>WARNING</RedundantBoolCompare>
+        <RedundantThisQualifier>WARNING</RedundantThisQualifier>
+        <RedundantBaseQualifier>WARNING</RedundantBaseQualifier>
+        <RedundantNameQualifier>WARNING</RedundantNameQualifier>
+        <RedundantCast>WARNING</RedundantCast>
+        <RedundantCatchClause>WARNING</RedundantCatchClause>
+        <RedundantEmptyFinallyBlock>WARNING</RedundantEmptyFinallyBlock>
+        <RedundantAssignment>WARNING</RedundantAssignment>
+        <RedundantToStringCall>WARNING</RedundantToStringCall>
+        <RedundantEnumerableCastCall>WARNING</RedundantEnumerableCastCall>
+        <RedundantStringToCharArrayCall>WARNING</RedundantStringToCharArrayCall>
+        <RedundantTypeArgumentsOfMethod>WARNING</RedundantTypeArgumentsOfMethod>
+        <UnusedAnonymousMethodSignature>WARNING</UnusedAnonymousMethodSignature>
+        <RedundantDelegateCreation>WARNING</RedundantDelegateCreation>
+        <RedundantAttributeParentheses>WARNING</RedundantAttributeParentheses>
+        <ForStatementConditionIsTrue>WARNING</ForStatementConditionIsTrue>
+        <RedundantUnsafeContext>WARNING</RedundantUnsafeContext>
+        <RedundantEmptyObjectCreationArgumentList>WARNING</RedundantEmptyObjectCreationArgumentList>
+        <RedundantEmptyObjectOrCollectionInitializer>WARNING</RedundantEmptyObjectOrCollectionInitializer>
+        <RedundantCollectionInitializerElementBraces>WARNING</RedundantCollectionInitializerElementBraces>
+        <RedundantExplicitArrayCreation>WARNING</RedundantExplicitArrayCreation>
+        <RedundantExplicitArraySize>WARNING</RedundantExplicitArraySize>
+        <RedundantIfElseBlock>WARNING</RedundantIfElseBlock>
+        <RedundantCaseLabel>WARNING</RedundantCaseLabel>
+        <RedundantAnonymousTypePropertyName>WARNING</RedundantAnonymousTypePropertyName>
+        <RedundantExplicitNullableCreation>WARNING</RedundantExplicitNullableCreation>
+        <RedundantLambdaParameterType>WARNING</RedundantLambdaParameterType>
+        <RedundantLambdaSignatureParentheses>WARNING</RedundantLambdaSignatureParentheses>
+        <DoubleNegationOperator>WARNING</DoubleNegationOperator>
+        <RedundantArgumentName>WARNING</RedundantArgumentName>
+        <RedundantArgumentDefaultValue>WARNING</RedundantArgumentDefaultValue>
+        <HeuristicUnreachableCode>WARNING</HeuristicUnreachableCode>
+        <RedundantCheckBeforeAssignment>WARNING</RedundantCheckBeforeAssignment>
+        <RedundantLogicalConditionalExpressionOperand>WARNING</RedundantLogicalConditionalExpressionOperand>
+        <RedundantStringType>SUGGESTION</RedundantStringType>
+        <OverridenWithSameValue>SUGGESTION</OverridenWithSameValue>
+        <DuplicateResource>WARNING</DuplicateResource>
+        <OverridenWithEmptyValue>WARNING</OverridenWithEmptyValue>
+        <NotOverridenInSpecificCulture>WARNING</NotOverridenInSpecificCulture>
+        <NotDeclaredInParentCulture>WARNING</NotDeclaredInParentCulture>
+        <FormatStringPlaceholdersMismatch>WARNING</FormatStringPlaceholdersMismatch>
+        <InvalidValueType>WARNING</InvalidValueType>
+        <LocalizableElement>WARNING</LocalizableElement>
+      </SeverityTable>
+    </HighlightingSettings>
+    <CodeCleanup RecentlyUsed="Full Cleanup" />
+    <TodoManager ActiveGrouping="0">
+      <Pattern Name="Todo" Id="961894CCC510410ABE2B99132B253C80" Regexp="(\W|^)(?&lt;TAG&gt;TODO)(\W|$)(.*)" CaseSensitive="False" Color="Blue" Icon="Normal" LookInComments="True" LookInIdentifiers="False" LookInStringLiterals="False" />
+      <Pattern Name="Note" Id="961894CCC510410ABE2B99132B253C81" Regexp="(\W|^)(?&lt;TAG&gt;NOTE)(\W|$)(.*)" CaseSensitive="False" Color="ffff8000" Icon="Warning" LookInComments="True" LookInIdentifiers="False" LookInStringLiterals="False" />
+      <Pattern Name="Bug" Id="9F4E80481F12431CB36D19D6738780F1" Regexp="(\W|^)(?&lt;TAG&gt;BUG)(\W|$)(.*)" CaseSensitive="False" Color="Red" Icon="Error" LookInComments="True" LookInIdentifiers="False" LookInStringLiterals="False" />
+      <Pattern Name="Not Implemented" Id="9F4E80481F12431CB36D19D6738780F2" Regexp="NotImplementedException" CaseSensitive="False" Color="Red" Icon="Edit" LookInComments="False" LookInIdentifiers="True" LookInStringLiterals="False" />
+      <Filter Name="Todos" Id="6E3EB9662CFB491EBD2103D8654051DF" Active="False">
+        <PatternRef Id="961894CCC510410ABE2B99132B253C80" />
+      </Filter>
+      <Filter Name="Notes" Id="0069D9FE451E44B181256291430424FC" Active="False">
+        <PatternRef Id="961894CCC510410ABE2B99132B253C81" />
+      </Filter>
+      <Filter Name="Bugs" Id="A674BC0145094E3D8C9C867C0FDAF288" Active="False">
+        <PatternRef Id="9F4E80481F12431CB36D19D6738780F1" />
+      </Filter>
+      <Filter Name="Not Implemented" Id="A674BC0145094E3D8C9C867C0FDAF289" Active="False">
+        <PatternRef Id="9F4E80481F12431CB36D19D6738780F2" />
+      </Filter>
+    </TodoManager>
+  </ResharperSettings>
 </Configuration>

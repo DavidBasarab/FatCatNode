@@ -80,6 +80,20 @@ namespace FatCatNode.Logic
             {
                 WriteSuccessfullyConnectionMessage(address);
             }
+            else if (DidNotSuccessfullyConnect(connectionStatus))
+            {
+                WriteCouldNotConnectMessage(address);
+            }
+        }
+
+        private static bool DidNotSuccessfullyConnect(NodeConnectionStatus connectionStatus)
+        {
+            return connectionStatus == NodeConnectionStatus.CouldNotConnect;
+        }
+
+        private void WriteCouldNotConnectMessage(IPAddress address)
+        {
+            WriteMessage("A node from address {0} could not be connected.", address);
         }
 
         private static bool SuccessfullyConnected(NodeConnectionStatus connectionStatus)

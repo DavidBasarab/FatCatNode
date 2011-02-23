@@ -44,7 +44,6 @@ namespace FatCatNode.Tests
         [Flags]
         private enum HelperFlags
         {
-            None = 0,
             ServiceHost = 1,
             Address = 2,
             Announcement = 4
@@ -182,49 +181,7 @@ namespace FatCatNode.Tests
 
             Mocks.ReplayAll();
 
-            var node = new Node(NodeId);
-
-            node.Connections = nodeConnections;
-
-            node.Start();
-
-            announcementService.Raise(v => v.OnOnlineEvent += null, this, args);
-
-            Mocks.ReplayAll();
-
-            Thread.Sleep(100);
-        }
-
-        [Test]
-        public void OnSuccessfullyConnectionAMessageWillBeSentToMessageWriter()
-        {
-            StubHelpers(HelperFlags.ServiceHost | HelperFlags.Address);
-
-            var announcementService = Mocks.DynamicMock<IAnnouncementService>();
-
-            NodeAnnouncementService.AnnoucementService = announcementService;
-
-            IPAddress ipAddress = IPAddress.Parse("55.55.55.55");
-
-            var args = new NodeAnnoucementEventArgs
-            {
-                Address = ipAddress
-            };
-
-            var nodeConnections = Mocks.DynamicMock<INodeConnections>();
-
-            nodeConnections.Expect(v => v.AddNodeToConnections(ipAddress)).Return(NodeConnectionStatus.Added);
-            nodeConnections.Expect(v => v.FindNodeIdByAddress(ipAddress)).Return("Node2");
-
-            IMessageWriter messageWriter = Mocks.DynamicMock<IMessageWriter>();
-
-            messageWriter.Expect(v => v.Message("A node with Id '{0}' connected from address {1}", "Node2", ipAddress));
-
-            Mocks.ReplayAll();
-
-            var node = new Node(NodeId, messageWriter);
-
-            node.Connections = nodeConnections;
+            var node = new Node(NodeId) {Connections = nodeConnections};
 
             node.Start();
 
@@ -251,6 +208,88 @@ namespace FatCatNode.Tests
             var node = new Node(NodeId);
 
             Assert.That(node.Id, Is.EqualTo(NodeId));
+        }
+
+        [Test]
+        public void OnSuccessfullyConnectionAMessageWillBeSentToMessageWriter()
+        {
+            StubHelpers(HelperFlags.ServiceHost | HelperFlags.Address);
+
+            var announcementService = Mocks.DynamicMock<IAnnouncementService>();
+
+            NodeAnnouncementService.AnnoucementService = announcementService;
+
+            IPAddress ipAddress = IPAddress.Parse("55.55.55.55");
+
+            var args = new NodeAnnoucementEventArgs
+                           {
+                               Address = ipAddress
+                           };
+
+            var nodeConnections = Mocks.DynamicMock<INodeConnections>();
+
+            nodeConnections.Expect(v => v.AddNodeToConnections(ipAddress)).Return(NodeConnectionStatus.Added);
+            nodeConnections.Expect(v => v.FindNodeIdByAddress(ipAddress)).Return("Node2");
+
+            var messageWriter = Mocks.DynamicMock<IMessageWriter>();
+
+            messageWriter.Expect(v => v.Message("A node with Id '{0}' connected from address {1}", "Node2", ipAddress));
+
+            Mocks.ReplayAll();
+
+            var node = new Node(NodeId, messageWriter)
+                           {
+                               Connections = nodeConnections
+                           };
+
+            node.Start();
+
+            announcementService.Raise(v => v.OnOnlineEvent += null, this, args);
+
+            Mocks.ReplayAll();
+
+            Thread.Sleep(100);
+        }
+
+        [Test]
+        public void IfANodeCannotBeConnectedToAMessageWritten()
+        {
+            StubHelpers(HelperFlags.ServiceHost | HelperFlags.Address);
+
+            var announcementService = Mocks.DynamicMock<IAnnouncementService>();
+
+            NodeAnnouncementService.AnnoucementService = announcementService;
+
+            IPAddress ipAddress = IPAddress.Parse("55.55.55.55");
+
+            var args = new NodeAnnoucementEventArgs
+            {
+                Address = ipAddress
+            };
+
+            var nodeConnections = Mocks.DynamicMock<INodeConnections>();
+
+            nodeConnections.Expect(v => v.AddNodeToConnections(ipAddress)).Return(NodeConnectionStatus.CouldNotConnect);
+            nodeConnections.Expect(v => v.FindNodeIdByAddress(ipAddress)).IgnoreArguments().Repeat.Never();
+
+            var messageWriter = Mocks.DynamicMock<IMessageWriter>();
+
+            messageWriter.Expect(v => v.Message("A node from address {0} could not be connected.", ipAddress));
+
+            Mocks.ReplayAll();
+
+            var node = new Node(NodeId, messageWriter)
+            {
+                Connections = nodeConnections
+            };
+
+            node.Start();
+
+            announcementService.Raise(v => v.OnOnlineEvent += null, this, args);
+
+            Mocks.ReplayAll();
+
+            Thread.Sleep(100);
         }
     }
 }
