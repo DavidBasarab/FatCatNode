@@ -13,17 +13,15 @@ namespace FatCatNode.Logic
         {
             MessageWriter = messageWriter;
 
-            RegisterForOfflineAndOnLineEvents();
-            SetNodeId(nodeId);
+            Initialize(nodeId);
         }
-
-        private IMessageWriter MessageWriter { get; set; }
 
         public Node(string nodeId)
         {
-            RegisterForOfflineAndOnLineEvents();
-            SetNodeId(nodeId);
+            Initialize(nodeId);
         }
+
+        private IMessageWriter MessageWriter { get; set; }
 
         public string Id { get; set; }
 
@@ -33,6 +31,12 @@ namespace FatCatNode.Logic
         }
 
         public INodeConnections Connections { get; set; }
+
+        private void Initialize(string nodeId)
+        {
+            RegisterForOfflineAndOnLineEvents();
+            SetNodeId(nodeId);
+        }
 
         private void SetNodeId(string nodeId)
         {
@@ -72,10 +76,21 @@ namespace FatCatNode.Logic
         {
             NodeConnectionStatus connectionStatus = Connections.AddNodeToConnections(address);
 
-            if (connectionStatus == NodeConnectionStatus.Added)
+            if (SuccessfullyConnected(connectionStatus))
             {
-                WriteMessage("A node with Id '{0}' connected from address {1}", Connections.FindNodeIdByAddress(address), address);
+                WriteSuccessfullyConnectionMessage(address);
             }
+        }
+
+        private static bool SuccessfullyConnected(NodeConnectionStatus connectionStatus)
+        {
+            return connectionStatus == NodeConnectionStatus.Added;
+        }
+
+        private void WriteSuccessfullyConnectionMessage(IPAddress address)
+        {
+            WriteMessage("A node with Id '{0}' connected from address {1}", Connections.FindNodeIdByAddress(address),
+                         address);
         }
 
         private void WriteMessage(string message, params object[] args)
