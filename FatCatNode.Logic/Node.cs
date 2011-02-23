@@ -9,10 +9,12 @@ namespace FatCatNode.Logic
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single)]
     public class Node : INode
     {
+        private INodeConnections _connections;
+
         public Node(string nodeId)
         {
-            SetNodeId(nodeId);
             RegisterForOfflineAndOnLineEvents();
+            SetNodeId(nodeId);
         }
 
         public string Id { get; set; }
@@ -22,6 +24,18 @@ namespace FatCatNode.Logic
             get
             {
                 return AddressHelper.Helper.FindBaseAddress();
+            }
+        }
+
+        public INodeConnections Connections
+        {
+            get 
+            {
+                return _connections;
+            }
+            set 
+            {
+                _connections = value;
             }
         }
 
@@ -56,6 +70,7 @@ namespace FatCatNode.Logic
 
         private void OnOnlineEvent(object sender, NodeAnnoucementEventArgs e)
         {
+            Connections.AddNodeToConnections(e.Address);
         }
 
         private void OnOfflineEvent(object sender, NodeAnnoucementEventArgs e)

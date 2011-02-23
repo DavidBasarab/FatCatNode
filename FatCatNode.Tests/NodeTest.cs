@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net;
 using System.ServiceModel.Discovery;
+using System.Threading;
 using FatCatNode.Logic;
 using FatCatNode.Logic.Arguments;
 using FatCatNode.Logic.Interfaces;
@@ -163,6 +164,8 @@ namespace FatCatNode.Tests
         [Test]
         public void OnCreationNodeWillInformTheAddressHelperOfTheNodeId()
         {
+            StubHelpers(HelperFlags.Announcement);
+
             var addressHelper = Mocks.DynamicMock<IAddressHelper>();
 
             addressHelper.Expect(v => v.SetNodeId(NodeId));
@@ -177,7 +180,7 @@ namespace FatCatNode.Tests
         }
 
         [Test]
-        public void TempEventRaiserTester()
+        public void OnConnectionEventTheNodeWillBeAddedToConnections()
         {
             StubHelpers(HelperFlags.ServiceHost | HelperFlags.Address);
 
@@ -185,14 +188,21 @@ namespace FatCatNode.Tests
 
             NodeAnnouncementService.AnnoucementService = announcementService;
 
+            IPAddress ipAddress = IPAddress.Parse("55.55.55.55");
+
             NodeAnnoucementEventArgs args = new NodeAnnoucementEventArgs()
                                             {
-                                                Address = IPAddress.Parse("127.0.0.1")
+                                                Address = ipAddress
                                             };
+
+            INodeConnections nodeConnections = Mocks.DynamicMock<INodeConnections>();
+
+            nodeConnections.Expect(v => v.AddNodeToConnections(ipAddress)).Return(NodeConnectionStatus.Added);
 
             Mocks.ReplayAll();
 
             Node node = new Node(NodeId);
+            node.Connections = nodeConnections;
 
             node.Start();
 
@@ -200,7 +210,7 @@ namespace FatCatNode.Tests
 
             Mocks.ReplayAll();
 
-            Assert.Fail();
+            Thread.Sleep(100);
         }
     }
 }
