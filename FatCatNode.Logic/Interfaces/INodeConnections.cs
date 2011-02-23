@@ -8,6 +8,8 @@ namespace FatCatNode.Logic.Interfaces
 {
     public interface INodeConnections
     {
-        bool AddNodeToConnections(IPAddress address);
+        NodeConnectionStatus AddNodeToConnections(IPAddress address);
+
+        NodeConnectionStatus RemoveNodeFromConnections(IPAddress address);
     }
 }
