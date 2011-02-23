@@ -47,6 +47,7 @@
     <Compile Include="Common.cs" />
     <Compile Include="Interfaces\IAddressHelper.cs" />
     <Compile Include="Interfaces\IAnnouncementService.cs" />
+    <Compile Include="Interfaces\IMessageWriter.cs" />
     <Compile Include="Interfaces\INode.cs" />
     <Compile Include="Interfaces\INodeConnections.cs" />
     <Compile Include="Interfaces\IServiceHostHelper.cs" />

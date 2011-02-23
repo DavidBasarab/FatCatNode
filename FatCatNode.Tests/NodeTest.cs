@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Net;
-using System.ServiceModel.Discovery;
 using System.Threading;
 using FatCatNode.Logic;
 using FatCatNode.Logic.Arguments;
@@ -162,6 +161,81 @@ namespace FatCatNode.Tests
         }
 
         [Test]
+        public void OnConnectionEventTheNodeWillBeAddedToConnections()
+        {
+            StubHelpers(HelperFlags.ServiceHost | HelperFlags.Address);
+
+            var announcementService = Mocks.DynamicMock<IAnnouncementService>();
+
+            NodeAnnouncementService.AnnoucementService = announcementService;
+
+            IPAddress ipAddress = IPAddress.Parse("55.55.55.55");
+
+            var args = new NodeAnnoucementEventArgs
+                           {
+                               Address = ipAddress
+                           };
+
+            var nodeConnections = Mocks.DynamicMock<INodeConnections>();
+
+            nodeConnections.Expect(v => v.AddNodeToConnections(ipAddress)).Return(NodeConnectionStatus.Added);
+
+            Mocks.ReplayAll();
+
+            var node = new Node(NodeId);
+
+            node.Connections = nodeConnections;
+
+            node.Start();
+
+            announcementService.Raise(v => v.OnOnlineEvent += null, this, args);
+
+            Mocks.ReplayAll();
+
+            Thread.Sleep(100);
+        }
+
+        [Test]
+        public void OnSuccessfullyConnectionAMessageWillBeSentToMessageWriter()
+        {
+            StubHelpers(HelperFlags.ServiceHost | HelperFlags.Address);
+
+            var announcementService = Mocks.DynamicMock<IAnnouncementService>();
+
+            NodeAnnouncementService.AnnoucementService = announcementService;
+
+            IPAddress ipAddress = IPAddress.Parse("55.55.55.55");
+
+            var args = new NodeAnnoucementEventArgs
+            {
+                Address = ipAddress
+            };
+
+            var nodeConnections = Mocks.DynamicMock<INodeConnections>();
+
+            nodeConnections.Expect(v => v.AddNodeToConnections(ipAddress)).Return(NodeConnectionStatus.Added);
+            nodeConnections.Expect(v => v.FindNodeIdByAddress(ipAddress)).Return("Node2");
+
+            IMessageWriter messageWriter = Mocks.DynamicMock<IMessageWriter>();
+
+            messageWriter.Expect(v => v.Message("A node with Id '{0}' connected from address {1}", "Node2", ipAddress));
+
+            Mocks.ReplayAll();
+
+            var node = new Node(NodeId, messageWriter);
+
+            node.Connections = nodeConnections;
+
+            node.Start();
+
+            announcementService.Raise(v => v.OnOnlineEvent += null, this, args);
+
+            Mocks.ReplayAll();
+
+            Thread.Sleep(100);
+        }
+
+        [Test]
         public void OnCreationNodeWillInformTheAddressHelperOfTheNodeId()
         {
             StubHelpers(HelperFlags.Announcement);
@@ -177,40 +251,6 @@ namespace FatCatNode.Tests
             var node = new Node(NodeId);
 
             Assert.That(node.Id, Is.EqualTo(NodeId));
-        }
-
-        [Test]
-        public void OnConnectionEventTheNodeWillBeAddedToConnections()
-        {
-            StubHelpers(HelperFlags.ServiceHost | HelperFlags.Address);
-
-            IAnnouncementService announcementService = Mocks.DynamicMock<IAnnouncementService>();
-
-            NodeAnnouncementService.AnnoucementService = announcementService;
-
-            IPAddress ipAddress = IPAddress.Parse("55.55.55.55");
-
-            NodeAnnoucementEventArgs args = new NodeAnnoucementEventArgs()
-                                            {
-                                                Address = ipAddress
-                                            };
-
-            INodeConnections nodeConnections = Mocks.DynamicMock<INodeConnections>();
-
-            nodeConnections.Expect(v => v.AddNodeToConnections(ipAddress)).Return(NodeConnectionStatus.Added);
-
-            Mocks.ReplayAll();
-
-            Node node = new Node(NodeId);
-            node.Connections = nodeConnections;
-
-            node.Start();
-
-            announcementService.Raise(v => v.OnOnlineEvent += null, this, args);
-
-            Mocks.ReplayAll();
-
-            Thread.Sleep(100);
         }
     }
 }

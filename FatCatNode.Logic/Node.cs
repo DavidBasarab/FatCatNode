@@ -1,6 +1,6 @@
 ﻿using System;
+using System.Net;
 using System.ServiceModel;
-using System.ServiceModel.Discovery;
 using FatCatNode.Logic.Arguments;
 using FatCatNode.Logic.Interfaces;
 
@@ -9,7 +9,15 @@ namespace FatCatNode.Logic
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single)]
     public class Node : INode
     {
-        private INodeConnections _connections;
+        public Node(string nodeId, IMessageWriter messageWriter)
+        {
+            MessageWriter = messageWriter;
+
+            RegisterForOfflineAndOnLineEvents();
+            SetNodeId(nodeId);
+        }
+
+        private IMessageWriter MessageWriter { get; set; }
 
         public Node(string nodeId)
         {
@@ -21,23 +29,10 @@ namespace FatCatNode.Logic
 
         public Uri BaseAddress
         {
-            get
-            {
-                return AddressHelper.Helper.FindBaseAddress();
-            }
+            get { return AddressHelper.Helper.FindBaseAddress(); }
         }
 
-        public INodeConnections Connections
-        {
-            get 
-            {
-                return _connections;
-            }
-            set 
-            {
-                _connections = value;
-            }
-        }
+        public INodeConnections Connections { get; set; }
 
         private void SetNodeId(string nodeId)
         {
@@ -70,7 +65,25 @@ namespace FatCatNode.Logic
 
         private void OnOnlineEvent(object sender, NodeAnnoucementEventArgs e)
         {
-            Connections.AddNodeToConnections(e.Address);
+            AddToConnections(e.Address);
+        }
+
+        private void AddToConnections(IPAddress address)
+        {
+            NodeConnectionStatus connectionStatus = Connections.AddNodeToConnections(address);
+
+            if (connectionStatus == NodeConnectionStatus.Added)
+            {
+                WriteMessage("A node with Id '{0}' connected from address {1}", Connections.FindNodeIdByAddress(address), address);
+            }
+        }
+
+        private void WriteMessage(string message, params object[] args)
+        {
+            if (MessageWriter != null)
+            {
+                MessageWriter.Message(message, args);
+            }
         }
 
         private void OnOfflineEvent(object sender, NodeAnnoucementEventArgs e)

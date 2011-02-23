@@ -10,6 +10,8 @@ namespace FatCatNode.Logic.Interfaces
     {
         NodeConnectionStatus AddNodeToConnections(IPAddress address);
 
+        string FindNodeIdByAddress(IPAddress address);
+
         NodeConnectionStatus RemoveNodeFromConnections(IPAddress address);
     }
 }
