@@ -36,7 +36,6 @@ namespace FatCatNode.Tests
         {
             AddressHelper.Helper = null;
             ServiceHostHelper.Helper = null;
-            NodeAnnouncementService.AnnoucementService = null;
         }
 
         public MockRepository Mocks { get; set; }
@@ -81,11 +80,11 @@ namespace FatCatNode.Tests
             ServiceHostHelper.Helper = serviceHostStub;
         }
 
-        private void StubAnnoucementService()
+        private IAnnouncementService StubAnnoucementService()
         {
             var announcementService = Mocks.Stub<IAnnouncementService>();
 
-            NodeAnnouncementService.AnnoucementService = announcementService;
+            return announcementService;
         }
 
         [Test]
@@ -123,11 +122,11 @@ namespace FatCatNode.Tests
 
             announcementService.Expect(v => v.Start());
 
-            NodeAnnouncementService.AnnoucementService = announcementService;
-
             Mocks.ReplayAll();
 
             var node = new Node(NodeId);
+
+            node.AnnouncementService = announcementService;
 
             node.Start();
         }
@@ -166,8 +165,6 @@ namespace FatCatNode.Tests
 
             var announcementService = Mocks.DynamicMock<IAnnouncementService>();
 
-            NodeAnnouncementService.AnnoucementService = announcementService;
-
             IPAddress ipAddress = IPAddress.Parse("55.55.55.55");
 
             var args = new NodeAnnoucementEventArgs
@@ -181,7 +178,11 @@ namespace FatCatNode.Tests
 
             Mocks.ReplayAll();
 
-            var node = new Node(NodeId) {Connections = nodeConnections};
+            var node = new Node(NodeId) 
+            {
+                Connections = nodeConnections,
+                AnnouncementService = announcementService
+            };
 
             node.Start();
 
@@ -217,8 +218,6 @@ namespace FatCatNode.Tests
 
             var announcementService = Mocks.DynamicMock<IAnnouncementService>();
 
-            NodeAnnouncementService.AnnoucementService = announcementService;
-
             IPAddress ipAddress = IPAddress.Parse("55.55.55.55");
 
             var args = new NodeAnnoucementEventArgs
@@ -239,7 +238,8 @@ namespace FatCatNode.Tests
 
             var node = new Node(NodeId, messageWriter)
                            {
-                               Connections = nodeConnections
+                               Connections = nodeConnections,
+                               AnnouncementService = announcementService
                            };
 
             node.Start();
@@ -257,8 +257,6 @@ namespace FatCatNode.Tests
             StubHelpers(HelperFlags.ServiceHost | HelperFlags.Address);
 
             var announcementService = Mocks.DynamicMock<IAnnouncementService>();
-
-            NodeAnnouncementService.AnnoucementService = announcementService;
 
             IPAddress ipAddress = IPAddress.Parse("55.55.55.55");
 
@@ -280,7 +278,8 @@ namespace FatCatNode.Tests
 
             var node = new Node(NodeId, messageWriter)
             {
-                Connections = nodeConnections
+                Connections = nodeConnections,
+                AnnouncementService = announcementService
             };
 
             node.Start();

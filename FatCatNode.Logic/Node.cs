@@ -9,16 +9,18 @@ namespace FatCatNode.Logic
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single)]
     public class Node : INode
     {
+        private IAnnouncementService _announcementService;
+
         public Node(string nodeId, IMessageWriter messageWriter)
         {
             MessageWriter = messageWriter;
-
-            Initialize(nodeId);
+            
+            SetNodeId(nodeId);
         }
 
         public Node(string nodeId)
         {
-            Initialize(nodeId);
+            SetNodeId(nodeId);
         }
 
         private IMessageWriter MessageWriter { get; set; }
@@ -32,10 +34,15 @@ namespace FatCatNode.Logic
 
         public INodeConnections Connections { get; set; }
 
-        private void Initialize(string nodeId)
+        public IAnnouncementService AnnouncementService
+        {
+            get { return _announcementService ?? (_announcementService = new NodeAnnouncementService()); }
+            set { _announcementService = value; }
+        }
+
+        private void Initialize()
         {
             RegisterForOfflineAndOnLineEvents();
-            SetNodeId(nodeId);
         }
 
         private void SetNodeId(string nodeId)
@@ -47,6 +54,8 @@ namespace FatCatNode.Logic
 
         public void Start()
         {
+            Initialize();
+
             MakeServiceAnnoucement();
             OpenServiceHost();
         }
@@ -56,15 +65,15 @@ namespace FatCatNode.Logic
             ServiceHostHelper.Helper.OpenServiceHost(this, BaseAddress);
         }
 
-        private static void MakeServiceAnnoucement()
+        private void MakeServiceAnnoucement()
         {
-            NodeAnnouncementService.AnnoucementService.Start();
+            AnnouncementService.Start();
         }
 
         private void RegisterForOfflineAndOnLineEvents()
         {
-            NodeAnnouncementService.AnnoucementService.OnOnlineEvent += OnOnlineEvent;
-            NodeAnnouncementService.AnnoucementService.OnOfflineEvent += OnOfflineEvent;
+            AnnouncementService.OnOnlineEvent += OnOnlineEvent;
+            AnnouncementService.OnOfflineEvent += OnOfflineEvent;
         }
 
         private void OnOnlineEvent(object sender, NodeAnnoucementEventArgs e)

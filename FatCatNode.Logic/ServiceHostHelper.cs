@@ -19,6 +19,8 @@ namespace FatCatNode.Logic
             }
         }
 
+        public IAnnouncementService AnnouncementService { get; set; }
+
         public void OpenServiceHost(INode nodeInstance, Uri baseAddress)
         {
             throw new NotImplementedException();

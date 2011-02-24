@@ -23,7 +23,6 @@ namespace FatCatNode.Tests
             Mocks.VerifyAll();
 
             ServiceHostHelper.Helper = null;
-            NodeAnnouncementService.AnnoucementService = null;
         }
 
         #endregion
@@ -37,11 +36,11 @@ namespace FatCatNode.Tests
             ServiceHostHelper.Helper = serviceHostHelper;
         }
 
-        private void StubAnnoucementService()
+        private IAnnouncementService StubAnnoucementService()
         {
             var announcementServiceStub = Mocks.Stub<IAnnouncementService>();
 
-            NodeAnnouncementService.AnnoucementService = announcementServiceStub;
+            return announcementServiceStub;
         }
 
         [Test]
@@ -67,8 +66,6 @@ namespace FatCatNode.Tests
 
             announcementService.Expect(v => v.Start());
 
-            NodeAnnouncementService.AnnoucementService = announcementService;
-
             var serviceHostHelper = Mocks.DynamicMock<IServiceHostHelper>();
 
             serviceHostHelper.Expect(v => v.OpenServiceHost(null, null)).IgnoreArguments();
@@ -79,7 +76,10 @@ namespace FatCatNode.Tests
 
             Mocks.Ordered();
 
-            var listener = new NodeListener("JUNK");
+            var listener = new NodeListener("JUNK")
+                               {
+                                   AnnouncementService = announcementService
+                               };
 
             listener.Start(null, null);
         }
@@ -97,9 +97,9 @@ namespace FatCatNode.Tests
 
             Mocks.ReplayAll();
 
-            NodeAnnouncementService.AnnoucementService = announcementService;
-
             var listener = new NodeListener("JUNK");
+
+            listener.AnnouncementService = announcementService;
         }
 
         [Test]
@@ -119,9 +119,9 @@ namespace FatCatNode.Tests
 
             Mocks.ReplayAll();
 
-            NodeAnnouncementService.AnnoucementService = announcementService;
-
             var listener = new NodeListener("JUNK");
+
+            listener.AnnouncementService = announcementService;
 
             listener.Start(null, null);
         }
@@ -133,7 +133,7 @@ namespace FatCatNode.Tests
 
             var serviceHostHelper = Mocks.DynamicMock<IServiceHostHelper>();
 
-            StubAnnoucementService();
+            IAnnouncementService annoucementService = StubAnnoucementService();
 
             var baseAddress = new Uri("http://fatcatnode.com/Testing");
 
@@ -144,6 +144,8 @@ namespace FatCatNode.Tests
             Mocks.ReplayAll();
 
             var listener = new NodeListener("TestNodeId");
+
+            listener.AnnouncementService = annoucementService;
 
             listener.Start(mockNode, baseAddress);
         }

@@ -14,19 +14,21 @@ namespace FatCatNode.Logic
 
         public string Id { get; private set; }
 
+        public IAnnouncementService AnnouncementService { get; set; }
+
         public void Start(INode instance, Uri baseAddress)
         {
             RegisterForOfflineAndOnLineEvents();
 
-            NodeAnnouncementService.AnnoucementService.Start();
+            AnnouncementService.Start();
 
             ServiceHostHelper.Helper.OpenServiceHost(instance, baseAddress);
         }
 
         private void RegisterForOfflineAndOnLineEvents()
         {
-            NodeAnnouncementService.AnnoucementService.OnOnlineEvent += OnOnlineEvent;
-            NodeAnnouncementService.AnnoucementService.OnOfflineEvent += OnOfflineEvent;
+            AnnouncementService.OnOnlineEvent += OnOnlineEvent;
+            AnnouncementService.OnOfflineEvent += OnOfflineEvent;
         }
 
         private void OnOnlineEvent(object sender, NodeAnnoucementEventArgs e)

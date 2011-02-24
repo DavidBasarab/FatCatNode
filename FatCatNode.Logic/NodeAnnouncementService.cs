@@ -7,31 +7,12 @@ namespace FatCatNode.Logic
 {
     public class NodeAnnouncementService : IAnnouncementService
     {
-        private static IAnnouncementService _overridenNodeAnnoucement;
-
-        public static IAnnouncementService AnnoucementService
-        {
-            get
-            {
-                return _overridenNodeAnnoucement ?? Nested.Instance;
-            }
-            set
-            {
-                _overridenNodeAnnoucement = value;
-            }
-        }
-
         public void Start()
         {
-            throw new NotImplementedException();
+            // TODO
         }
 
         public event Action<object, NodeAnnoucementEventArgs> OnOnlineEvent;
         public event Action<object, NodeAnnoucementEventArgs> OnOfflineEvent;
-
-        private class Nested
-        {
-            internal static readonly NodeAnnouncementService Instance = new NodeAnnouncementService();
-        }
     }
 }
