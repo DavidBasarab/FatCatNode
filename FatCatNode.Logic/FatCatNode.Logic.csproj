@@ -53,6 +53,7 @@
     <Compile Include="Interfaces\IServiceHostHelper.cs" />
     <Compile Include="Node.cs" />
     <Compile Include="NodeAnnouncementService.cs" />
+    <Compile Include="OnConnectionMessageWriter.cs" />
     <Compile Include="NodeListener.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ServiceHostHelper.cs" />

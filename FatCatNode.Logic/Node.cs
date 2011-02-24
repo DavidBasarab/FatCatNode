@@ -10,11 +10,12 @@ namespace FatCatNode.Logic
     public class Node : INode
     {
         private IAnnouncementService _announcementService;
+        private IServiceHostHelper _serviceHostHelper;
 
         public Node(string nodeId, IMessageWriter messageWriter)
         {
             MessageWriter = messageWriter;
-            
+
             SetNodeId(nodeId);
         }
 
@@ -23,7 +24,7 @@ namespace FatCatNode.Logic
             SetNodeId(nodeId);
         }
 
-        private IMessageWriter MessageWriter { get; set; }
+        public IMessageWriter MessageWriter { get; private set; }
 
         public string Id { get; set; }
 
@@ -40,7 +41,6 @@ namespace FatCatNode.Logic
             set { _announcementService = value; }
         }
 
-        private IServiceHostHelper _serviceHostHelper;
         public IServiceHostHelper ServiceHostHelper
         {
             get { return _serviceHostHelper ?? (_serviceHostHelper = new ServiceHostHelper()); }
@@ -92,41 +92,12 @@ namespace FatCatNode.Logic
         {
             NodeConnectionStatus connectionStatus = Connections.AddNodeToConnections(address);
 
-            if (SuccessfullyConnected(connectionStatus))
-            {
-                WriteSuccessfullyConnectionMessage(address);
-            }
-            else if (DidNotSuccessfullyConnect(connectionStatus))
-            {
-                WriteCouldNotConnectMessage(address);
-            }
-            else if (connectionStatus == NodeConnectionStatus.AlreadyConnected)
-            {
-                string nodeId = Connections.FindNodeIdByAddress(address);
-
-                WriteMessage("A node from address {0} is already connected with an Id of {1}.", address, nodeId);
-            }
+            WriteOnConnectionMessage(address, connectionStatus);
         }
 
-        private static bool DidNotSuccessfullyConnect(NodeConnectionStatus connectionStatus)
+        private void WriteOnConnectionMessage(IPAddress address, NodeConnectionStatus connectionStatus)
         {
-            return connectionStatus == NodeConnectionStatus.CouldNotConnect;
-        }
-
-        private void WriteCouldNotConnectMessage(IPAddress address)
-        {
-            WriteMessage("A node from address {0} could not be connected.", address);
-        }
-
-        private static bool SuccessfullyConnected(NodeConnectionStatus connectionStatus)
-        {
-            return connectionStatus == NodeConnectionStatus.Added;
-        }
-
-        private void WriteSuccessfullyConnectionMessage(IPAddress address)
-        {
-            WriteMessage("A node with Id '{0}' connected from address {1}", Connections.FindNodeIdByAddress(address),
-                         address);
+            var onConnectionMessageWriter = new OnConnectionMessageWriter(this, connectionStatus, address);
         }
 
         private void WriteMessage(string message, params object[] args)
