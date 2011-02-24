@@ -100,6 +100,12 @@ namespace FatCatNode.Logic
             {
                 WriteCouldNotConnectMessage(address);
             }
+            else if (connectionStatus == NodeConnectionStatus.AlreadyConnected)
+            {
+                string nodeId = Connections.FindNodeIdByAddress(address);
+
+                WriteMessage("A node from address {0} is already connected with an Id of {1}.", address, nodeId);
+            }
         }
 
         private static bool DidNotSuccessfullyConnect(NodeConnectionStatus connectionStatus)

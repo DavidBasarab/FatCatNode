@@ -107,6 +107,90 @@ namespace FatCatNode.Tests
         }
 
         [Test]
+        public void IfANodeCannotBeConnectedToAMessageWritten()
+        {
+            StubHelpers(HelperFlags.Address);
+            IServiceHostHelper serviceHostHelper = StubServiceHostHelper();
+
+            var announcementService = Mocks.DynamicMock<IAnnouncementService>();
+
+            IPAddress ipAddress = IPAddress.Parse("55.55.55.55");
+
+            var args = new NodeAnnoucementEventArgs
+                           {
+                               Address = ipAddress
+                           };
+
+            var nodeConnections = Mocks.DynamicMock<INodeConnections>();
+
+            nodeConnections.Expect(v => v.AddNodeToConnections(ipAddress)).Return(NodeConnectionStatus.CouldNotConnect);
+            nodeConnections.Expect(v => v.FindNodeIdByAddress(ipAddress)).IgnoreArguments().Repeat.Never();
+
+            var messageWriter = Mocks.DynamicMock<IMessageWriter>();
+
+            messageWriter.Expect(v => v.Message("A node from address {0} could not be connected.", ipAddress));
+
+            Mocks.ReplayAll();
+
+            var node = new Node(NodeId, messageWriter)
+                           {
+                               Connections = nodeConnections,
+                               AnnouncementService = announcementService,
+                               ServiceHostHelper = serviceHostHelper
+                           };
+
+            node.Start();
+
+            announcementService.Raise(v => v.OnOnlineEvent += null, this, args);
+
+            Mocks.ReplayAll();
+
+            Thread.Sleep(100);
+        }
+
+        [Test]
+        public void IfANodeIsAlreadyConnectedAMessageIsWritten()
+        {
+            StubHelpers(HelperFlags.Address);
+            IServiceHostHelper serviceHostHelper = StubServiceHostHelper();
+
+            var announcementService = Mocks.DynamicMock<IAnnouncementService>();
+
+            IPAddress ipAddress = IPAddress.Parse("55.55.55.55");
+
+            var args = new NodeAnnoucementEventArgs
+            {
+                Address = ipAddress
+            };
+
+            var nodeConnections = Mocks.DynamicMock<INodeConnections>();
+
+            nodeConnections.Expect(v => v.AddNodeToConnections(ipAddress)).Return(NodeConnectionStatus.AlreadyConnected);
+            nodeConnections.Expect(v => v.FindNodeIdByAddress(ipAddress)).Return("Node2");
+
+            var messageWriter = Mocks.DynamicMock<IMessageWriter>();
+
+            messageWriter.Expect(v => v.Message("A node from address {0} is already connected with an Id of {1}.", ipAddress, "Node2"));
+
+            Mocks.ReplayAll();
+
+            var node = new Node(NodeId, messageWriter)
+            {
+                Connections = nodeConnections,
+                AnnouncementService = announcementService,
+                ServiceHostHelper = serviceHostHelper
+            };
+
+            node.Start();
+
+            announcementService.Raise(v => v.OnOnlineEvent += null, this, args);
+
+            Mocks.ReplayAll();
+
+            Thread.Sleep(150);
+        }
+
+        [Test]
         public void NodeStartWillAnnouceTheService()
         {
             StubHelpers(HelperFlags.Address);
@@ -124,11 +208,11 @@ namespace FatCatNode.Tests
 
             Mocks.ReplayAll();
 
-            var node = new Node(NodeId);
-
-            node.ServiceHostHelper = serviceHostHelper;
-
-            node.AnnouncementService = announcementService;
+            var node = new Node(NodeId)
+                           {
+                               ServiceHostHelper = serviceHostHelper,
+                               AnnouncementService = announcementService
+                           };
 
             node.Start();
         }
@@ -181,12 +265,12 @@ namespace FatCatNode.Tests
 
             Mocks.ReplayAll();
 
-            var node = new Node(NodeId) 
-            {
-                Connections = nodeConnections,
-                AnnouncementService = announcementService,
-                ServiceHostHelper = serviceHostHelper
-            };
+            var node = new Node(NodeId)
+                           {
+                               Connections = nodeConnections,
+                               AnnouncementService = announcementService,
+                               ServiceHostHelper = serviceHostHelper
+                           };
 
             node.Start();
 
@@ -247,48 +331,6 @@ namespace FatCatNode.Tests
                                AnnouncementService = announcementService,
                                ServiceHostHelper = serviceHostHelper
                            };
-
-            node.Start();
-
-            announcementService.Raise(v => v.OnOnlineEvent += null, this, args);
-
-            Mocks.ReplayAll();
-
-            Thread.Sleep(100);
-        }
-
-        [Test]
-        public void IfANodeCannotBeConnectedToAMessageWritten()
-        {
-            StubHelpers(HelperFlags.Address);
-            IServiceHostHelper serviceHostHelper = StubServiceHostHelper();
-
-            var announcementService = Mocks.DynamicMock<IAnnouncementService>();
-
-            IPAddress ipAddress = IPAddress.Parse("55.55.55.55");
-
-            var args = new NodeAnnoucementEventArgs
-            {
-                Address = ipAddress
-            };
-
-            var nodeConnections = Mocks.DynamicMock<INodeConnections>();
-
-            nodeConnections.Expect(v => v.AddNodeToConnections(ipAddress)).Return(NodeConnectionStatus.CouldNotConnect);
-            nodeConnections.Expect(v => v.FindNodeIdByAddress(ipAddress)).IgnoreArguments().Repeat.Never();
-
-            var messageWriter = Mocks.DynamicMock<IMessageWriter>();
-
-            messageWriter.Expect(v => v.Message("A node from address {0} could not be connected.", ipAddress));
-
-            Mocks.ReplayAll();
-
-            var node = new Node(NodeId, messageWriter)
-            {
-                Connections = nodeConnections,
-                AnnouncementService = announcementService,
-                ServiceHostHelper = serviceHostHelper
-            };
 
             node.Start();
 

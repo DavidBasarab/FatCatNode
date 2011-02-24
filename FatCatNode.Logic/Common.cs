@@ -9,7 +9,7 @@ namespace FatCatNode.Logic
     {
         None,
         Added,
-        AlreadyInList,
+        AlreadyConnected,
         CouldNotConnect,
         Removed
     }
