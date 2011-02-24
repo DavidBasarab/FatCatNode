@@ -35,7 +35,6 @@ namespace FatCatNode.Tests
         private static void ResetHelpers()
         {
             AddressHelper.Helper = null;
-            ServiceHostHelper.Helper = null;
         }
 
         public MockRepository Mocks { get; set; }
@@ -73,11 +72,11 @@ namespace FatCatNode.Tests
             AddressHelper.Helper = addressHelper;
         }
 
-        private void StubServiceHostHelper()
+        private IServiceHostHelper StubServiceHostHelper()
         {
             var serviceHostStub = Mocks.Stub<IServiceHostHelper>();
 
-            ServiceHostHelper.Helper = serviceHostStub;
+            return serviceHostStub;
         }
 
         private IAnnouncementService StubAnnoucementService()
@@ -110,7 +109,8 @@ namespace FatCatNode.Tests
         [Test]
         public void NodeStartWillAnnouceTheService()
         {
-            StubHelpers(HelperFlags.ServiceHost | HelperFlags.Address);
+            StubHelpers(HelperFlags.Address);
+            IServiceHostHelper serviceHostHelper = StubServiceHostHelper();
 
             var announcementService = Mocks.DynamicMock<IAnnouncementService>();
 
@@ -125,6 +125,8 @@ namespace FatCatNode.Tests
             Mocks.ReplayAll();
 
             var node = new Node(NodeId);
+
+            node.ServiceHostHelper = serviceHostHelper;
 
             node.AnnouncementService = announcementService;
 
@@ -151,9 +153,9 @@ namespace FatCatNode.Tests
 
             serviceHostHelper.Expect(v => v.OpenServiceHost(node, node.BaseAddress));
 
-            ServiceHostHelper.Helper = serviceHostHelper;
-
             Mocks.ReplayAll();
+
+            node.ServiceHostHelper = serviceHostHelper;
 
             node.Start();
         }
@@ -161,7 +163,8 @@ namespace FatCatNode.Tests
         [Test]
         public void OnConnectionEventTheNodeWillBeAddedToConnections()
         {
-            StubHelpers(HelperFlags.ServiceHost | HelperFlags.Address);
+            StubHelpers(HelperFlags.Address);
+            IServiceHostHelper serviceHostHelper = StubServiceHostHelper();
 
             var announcementService = Mocks.DynamicMock<IAnnouncementService>();
 
@@ -181,7 +184,8 @@ namespace FatCatNode.Tests
             var node = new Node(NodeId) 
             {
                 Connections = nodeConnections,
-                AnnouncementService = announcementService
+                AnnouncementService = announcementService,
+                ServiceHostHelper = serviceHostHelper
             };
 
             node.Start();
@@ -214,7 +218,8 @@ namespace FatCatNode.Tests
         [Test]
         public void OnSuccessfullyConnectionAMessageWillBeSentToMessageWriter()
         {
-            StubHelpers(HelperFlags.ServiceHost | HelperFlags.Address);
+            StubHelpers(HelperFlags.Address);
+            IServiceHostHelper serviceHostHelper = StubServiceHostHelper();
 
             var announcementService = Mocks.DynamicMock<IAnnouncementService>();
 
@@ -239,7 +244,8 @@ namespace FatCatNode.Tests
             var node = new Node(NodeId, messageWriter)
                            {
                                Connections = nodeConnections,
-                               AnnouncementService = announcementService
+                               AnnouncementService = announcementService,
+                               ServiceHostHelper = serviceHostHelper
                            };
 
             node.Start();
@@ -254,7 +260,8 @@ namespace FatCatNode.Tests
         [Test]
         public void IfANodeCannotBeConnectedToAMessageWritten()
         {
-            StubHelpers(HelperFlags.ServiceHost | HelperFlags.Address);
+            StubHelpers(HelperFlags.Address);
+            IServiceHostHelper serviceHostHelper = StubServiceHostHelper();
 
             var announcementService = Mocks.DynamicMock<IAnnouncementService>();
 
@@ -279,7 +286,8 @@ namespace FatCatNode.Tests
             var node = new Node(NodeId, messageWriter)
             {
                 Connections = nodeConnections,
-                AnnouncementService = announcementService
+                AnnouncementService = announcementService,
+                ServiceHostHelper = serviceHostHelper
             };
 
             node.Start();

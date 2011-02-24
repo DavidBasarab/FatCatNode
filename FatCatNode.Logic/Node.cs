@@ -40,6 +40,13 @@ namespace FatCatNode.Logic
             set { _announcementService = value; }
         }
 
+        private IServiceHostHelper _serviceHostHelper;
+        public IServiceHostHelper ServiceHostHelper
+        {
+            get { return _serviceHostHelper ?? (_serviceHostHelper = new ServiceHostHelper()); }
+            set { _serviceHostHelper = value; }
+        }
+
         private void Initialize()
         {
             RegisterForOfflineAndOnLineEvents();
@@ -62,7 +69,7 @@ namespace FatCatNode.Logic
 
         private void OpenServiceHost()
         {
-            ServiceHostHelper.Helper.OpenServiceHost(this, BaseAddress);
+            ServiceHostHelper.OpenServiceHost(this, BaseAddress);
         }
 
         private void MakeServiceAnnoucement()

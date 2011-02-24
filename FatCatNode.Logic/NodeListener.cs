@@ -16,13 +16,15 @@ namespace FatCatNode.Logic
 
         public IAnnouncementService AnnouncementService { get; set; }
 
+        public IServiceHostHelper ServiceHostHelper { get; set; }
+
         public void Start(INode instance, Uri baseAddress)
         {
             RegisterForOfflineAndOnLineEvents();
 
             AnnouncementService.Start();
 
-            ServiceHostHelper.Helper.OpenServiceHost(instance, baseAddress);
+            ServiceHostHelper.OpenServiceHost(instance, baseAddress);
         }
 
         private void RegisterForOfflineAndOnLineEvents()

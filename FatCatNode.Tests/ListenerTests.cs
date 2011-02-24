@@ -21,19 +21,17 @@ namespace FatCatNode.Tests
         public void TearDown()
         {
             Mocks.VerifyAll();
-
-            ServiceHostHelper.Helper = null;
         }
 
         #endregion
 
         public MockRepository Mocks { get; set; }
 
-        private void StubServiceHostHelper()
+        private IServiceHostHelper StubServiceHostHelper()
         {
             var serviceHostHelper = Mocks.Stub<IServiceHostHelper>();
 
-            ServiceHostHelper.Helper = serviceHostHelper;
+            return serviceHostHelper;
         }
 
         private IAnnouncementService StubAnnoucementService()
@@ -70,15 +68,14 @@ namespace FatCatNode.Tests
 
             serviceHostHelper.Expect(v => v.OpenServiceHost(null, null)).IgnoreArguments();
 
-            ServiceHostHelper.Helper = serviceHostHelper;
-
             Mocks.ReplayAll();
 
             Mocks.Ordered();
 
             var listener = new NodeListener("JUNK")
                                {
-                                   AnnouncementService = announcementService
+                                   AnnouncementService = announcementService,
+                                   ServiceHostHelper = serviceHostHelper
                                };
 
             listener.Start(null, null);
@@ -105,7 +102,7 @@ namespace FatCatNode.Tests
         [Test]
         public void WhenListenStartsAnAnnouncementIsMade()
         {
-            StubServiceHostHelper();
+            IServiceHostHelper serviceHostHelper = StubServiceHostHelper();
 
             var announcementService = Mocks.DynamicMock<IAnnouncementService>();
 
@@ -120,6 +117,7 @@ namespace FatCatNode.Tests
             Mocks.ReplayAll();
 
             var listener = new NodeListener("JUNK");
+            listener.ServiceHostHelper = serviceHostHelper;
 
             listener.AnnouncementService = announcementService;
 
@@ -139,11 +137,11 @@ namespace FatCatNode.Tests
 
             serviceHostHelper.Expect(v => v.OpenServiceHost(mockNode, baseAddress));
 
-            ServiceHostHelper.Helper = serviceHostHelper;
-
             Mocks.ReplayAll();
 
             var listener = new NodeListener("TestNodeId");
+
+            listener.ServiceHostHelper = serviceHostHelper;
 
             listener.AnnouncementService = annoucementService;
 
