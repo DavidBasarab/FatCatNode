@@ -12,10 +12,17 @@ namespace FatCatNode.Tests
     [TestFixture]
     public class NodeTest
     {
+        private static readonly Uri BaseAddress = new Uri("http://10.30.55.55:7777/UnitTestNode/FatCatNode");
+
         #region Setup/Teardown
 
         [SetUp]
         public void SetUp()
+        {
+            CreateMockRepository();
+        }
+
+        private void CreateMockRepository()
         {
             Mocks = new MockRepository();
         }
@@ -81,7 +88,7 @@ namespace FatCatNode.Tests
 
             addressHelper.Expect(v => v.SetNodeId(NodeId));
 
-            var desiredBaseAddress = new Uri("http://10.30.55.55:7777/UnitTestNode/FatCatNode");
+            var desiredBaseAddress = BaseAddress;
 
             addressHelper.Expect(v => v.FindBaseAddress()).Return(desiredBaseAddress);
 
@@ -210,8 +217,7 @@ namespace FatCatNode.Tests
         {
             var addressHelper = Mocks.DynamicMock<IAddressHelper>();
 
-            addressHelper.Expect(v => v.FindBaseAddress()).Return(
-                new Uri("http://10.30.55.55:7777/UnitTestNode/FatCatNode"));
+            addressHelper.Expect(v => v.FindBaseAddress()).Return(BaseAddress);
 
             AddressHelper.Helper = addressHelper;
 
