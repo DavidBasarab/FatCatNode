@@ -42,26 +42,14 @@ namespace FatCatNode.Tests
         [Flags]
         private enum HelperFlags
         {
-            ServiceHost = 1,
-            Address = 2,
-            Announcement = 4
+            Address = 2
         }
 
         private void StubHelpers(HelperFlags flag)
         {
-            if (flag.IsSet(HelperFlags.ServiceHost))
-            {
-                StubServiceHostHelper();
-            }
-
             if (flag.IsSet(HelperFlags.Address))
             {
                 StubAddressHelper();
-            }
-
-            if (flag.IsSet(HelperFlags.Announcement))
-            {
-                StubAnnoucementService();
             }
         }
 
@@ -220,8 +208,6 @@ namespace FatCatNode.Tests
         [Test]
         public void NodeStartWillOpenAServiceHostConnection()
         {
-            StubHelpers(HelperFlags.Announcement);
-
             var addressHelper = Mocks.DynamicMock<IAddressHelper>();
 
             addressHelper.Expect(v => v.FindBaseAddress()).Return(
@@ -284,8 +270,6 @@ namespace FatCatNode.Tests
         [Test]
         public void OnCreationNodeWillInformTheAddressHelperOfTheNodeId()
         {
-            StubHelpers(HelperFlags.Announcement);
-
             var addressHelper = Mocks.DynamicMock<IAddressHelper>();
 
             addressHelper.Expect(v => v.SetNodeId(NodeId));
