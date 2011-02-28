@@ -53,7 +53,7 @@
     <Compile Include="Interfaces\INodeConnections.cs" />
     <Compile Include="Interfaces\IServiceHostHelper.cs" />
     <Compile Include="Interfaces\ITimeHelper.cs" />
-    <Compile Include="ConnectionHandler.cs" />
+    <Compile Include="ConnectionsHandler.cs" />
     <Compile Include="NodeAnnouncementService.cs" />
     <Compile Include="OnConnectionMessageWriter.cs" />
     <Compile Include="NodeListener.cs" />

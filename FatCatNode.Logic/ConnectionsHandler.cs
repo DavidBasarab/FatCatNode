@@ -5,21 +5,21 @@ using FatCatNode.Logic.Interfaces;
 
 namespace FatCatNode.Logic
 {
-    public class ConnectionHandler
+    public class ConnectionsHandler
     {
         private IAnnouncementService _announcementService;
         private INode _connectedNode;
         private IServiceHostHelper _serviceHostHelper;
         private ITimeHelper _timeHelper;
 
-        public ConnectionHandler(string nodeId, IMessageWriter messageWriter)
+        public ConnectionsHandler(string nodeId, IMessageWriter messageWriter)
         {
             MessageWriter = messageWriter;
 
             SetNodeId(nodeId);
         }
 
-        public ConnectionHandler(string nodeId)
+        public ConnectionsHandler(string nodeId)
         {
             SetNodeId(nodeId);
         }

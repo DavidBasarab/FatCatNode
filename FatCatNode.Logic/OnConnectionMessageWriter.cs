@@ -4,9 +4,9 @@ namespace FatCatNode.Logic
 {
     internal class OnConnectionMessageWriter
     {
-        public OnConnectionMessageWriter(ConnectionHandler connectionHandler, NodeConnectionStatus connectionStatus, IPAddress address)
+        public OnConnectionMessageWriter(ConnectionsHandler connectionsHandler, NodeConnectionStatus connectionStatus, IPAddress address)
         {
-            ConnectionHandler = connectionHandler;
+            ConnectionsHandler = connectionsHandler;
             ConnectionStatus = connectionStatus;
             IpAddress = address;
         }
@@ -14,7 +14,7 @@ namespace FatCatNode.Logic
         private NodeConnectionStatus ConnectionStatus { get; set; }
         private IPAddress IpAddress { get; set; }
 
-        private ConnectionHandler ConnectionHandler { get; set; }
+        private ConnectionsHandler ConnectionsHandler { get; set; }
 
         public void WriteConnectionMessage()
         {
@@ -50,14 +50,14 @@ namespace FatCatNode.Logic
         private void WriteSuccessfullyConnectionMessage()
         {
             WriteMessage("A node with Id '{0}' connected from address {1}",
-                         ConnectionHandler.Connections.FindNodeIdByAddress(IpAddress), IpAddress);
+                         ConnectionsHandler.Connections.FindNodeIdByAddress(IpAddress), IpAddress);
         }
 
         private void WriteMessage(string message, params object[] args)
         {
-            if (ConnectionHandler.MessageWriter != null)
+            if (ConnectionsHandler.MessageWriter != null)
             {
-                ConnectionHandler.MessageWriter.Message(message, args);
+                ConnectionsHandler.MessageWriter.Message(message, args);
             }
         }
 
@@ -68,7 +68,7 @@ namespace FatCatNode.Logic
 
         private void WriteAlreadyConnectedMessage()
         {
-            string nodeId = ConnectionHandler.Connections.FindNodeIdByAddress(IpAddress);
+            string nodeId = ConnectionsHandler.Connections.FindNodeIdByAddress(IpAddress);
 
             WriteMessage("A node from address {0} is already connected with an Id of {1}.", IpAddress, nodeId);
         }
