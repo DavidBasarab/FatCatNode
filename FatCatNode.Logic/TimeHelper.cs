@@ -6,9 +6,9 @@ namespace FatCatNode.Logic
 {
     public class TimeHelper : ITimeHelper
     {
-        private static TimeHelper _overridenHelper;
+        private static ITimeHelper _overridenHelper;
 
-        public static TimeHelper Helper
+        public static ITimeHelper Helper
         {
             get { return _overridenHelper ?? Nested.Instance; }
             set { _overridenHelper = value; }

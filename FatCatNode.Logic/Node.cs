@@ -64,6 +64,9 @@ namespace FatCatNode.Logic
             Initialize();
 
             MakeServiceAnnoucement();
+
+            TimeHelper.Helper.Sleep(400);
+
             OpenServiceHost();
         }
 

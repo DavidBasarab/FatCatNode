@@ -20,6 +20,8 @@ namespace FatCatNode.Tests
         public void SetUp()
         {
             CreateMockRepository();
+
+            StubTimeHelper();
         }
 
         private void CreateMockRepository()
@@ -42,6 +44,7 @@ namespace FatCatNode.Tests
         private static void ResetHelpers()
         {
             AddressHelper.Helper = null;
+            TimeHelper.Helper = null;
         }
 
         public MockRepository Mocks { get; set; }
@@ -58,6 +61,13 @@ namespace FatCatNode.Tests
             {
                 StubAddressHelper();
             }
+        }
+
+        private void StubTimeHelper()
+        {
+            ITimeHelper timeHelper = Mocks.Stub<ITimeHelper>();
+
+            TimeHelper.Helper = timeHelper;
         }
 
         private void StubAddressHelper()
@@ -215,15 +225,11 @@ namespace FatCatNode.Tests
         [Test]
         public void NodeStartWillOpenAServiceHostConnection()
         {
-            var addressHelper = Mocks.DynamicMock<IAddressHelper>();
-
-            addressHelper.Expect(v => v.FindBaseAddress()).Return(BaseAddress);
-
-            AddressHelper.Helper = addressHelper;
+            CreateAddressHelperReturningBaseAddress();
 
             Mocks.ReplayAll();
 
-            var node = new Node(NodeId);
+            var node = CreateNode();
 
             var serviceHostHelper = Mocks.DynamicMock<IServiceHostHelper>();
 
@@ -234,6 +240,61 @@ namespace FatCatNode.Tests
             node.ServiceHostHelper = serviceHostHelper;
 
             node.Start();
+        }
+
+        private void CreateAddressHelperReturningBaseAddress()
+        {
+            var addressHelper = Mocks.DynamicMock<IAddressHelper>();
+
+            addressHelper.Expect(v => v.FindBaseAddress()).Return(BaseAddress);
+
+            AddressHelper.Helper = addressHelper;
+        }
+
+        [Test]
+        public void ANodeIsGoingToConnectAnnounceServiceIsStartedAThreadSleepsBeforeOpening()
+        {
+            var addressHelper = Mocks.DynamicMock<IAddressHelper>();
+
+            IAnnouncementService announcementService = Mocks.Stub<IAnnouncementService>();
+
+            ITimeHelper timeHelper = Mocks.DynamicMock<ITimeHelper>();
+            
+            IServiceHostHelper serviceHostHelper = Mocks.DynamicMock<IServiceHostHelper>();
+
+            using (Mocks.Ordered())
+            {
+                announcementService.OnOnlineEvent += null;
+                LastCall.IgnoreArguments();
+
+                announcementService.OnOfflineEvent += null;
+                LastCall.IgnoreArguments();
+
+                announcementService.Expect(v => v.Start());
+
+                timeHelper.Expect(v => v.Sleep(400));
+
+                addressHelper.Expect(v => v.FindBaseAddress()).Return(BaseAddress);
+
+                serviceHostHelper.Expect(v => v.OpenServiceHost(null, null)).IgnoreArguments(); 
+            }
+
+            AddressHelper.Helper = addressHelper;
+            TimeHelper.Helper = timeHelper;
+            
+            Mocks.ReplayAll();
+
+            var node = CreateNode();
+
+            node.AnnouncementService = announcementService;
+            node.ServiceHostHelper = serviceHostHelper;
+
+            node.Start();
+        }
+
+        private Node CreateNode()
+        {
+            return new Node(NodeId);
         }
 
         [Test]
