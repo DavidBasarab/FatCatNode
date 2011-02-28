@@ -10,7 +10,7 @@ using Rhino.Mocks;
 namespace FatCatNode.Tests
 {
     [TestFixture]
-    public class NodeTest
+    public class ConnectionsHandlerTest
     {
         #region Setup/Teardown
 
@@ -93,7 +93,7 @@ namespace FatCatNode.Tests
             AddressHelper.Helper = addressHelper;
         }
 
-        private static ConnectionsHandler CreateNode()
+        private static ConnectionsHandler CreateConnectionsHandler()
         {
             return new ConnectionsHandler(NodeId);
         }
@@ -130,7 +130,7 @@ namespace FatCatNode.Tests
 
             Mocks.ReplayAll();
 
-            ConnectionsHandler connectionsHandler = CreateNode();
+            ConnectionsHandler connectionsHandler = CreateConnectionsHandler();
 
             connectionsHandler.TimeHelper = timeHelper;
 
@@ -281,7 +281,7 @@ namespace FatCatNode.Tests
 
             var connectedNode = Mocks.DynamicMock<INode>();
 
-            ConnectionsHandler connectionsHandler = CreateNode();
+            ConnectionsHandler connectionsHandler = CreateConnectionsHandler();
 
             connectionsHandler.ConnectedNode = connectedNode;
 
@@ -347,6 +347,46 @@ namespace FatCatNode.Tests
             var connectionHandler = new ConnectionsHandler(NodeId);
 
             Assert.That(connectionHandler.Id, Is.EqualTo(NodeId));
+        }
+
+        [Test]
+        public void OnANodeDisconnectNodeWillBeRemovedFromConnections()
+        {
+            StubAddressHelper();
+
+            IAnnouncementService announcementService = Mocks.DynamicMock<IAnnouncementService>();
+
+            announcementService.OnOfflineEvent += null;
+            LastCall.IgnoreArguments();
+
+            announcementService.OnOnlineEvent += null;
+            LastCall.IgnoreArguments();
+
+            IPAddress ipAddress = IPAddress.Parse("55.55.55.55");
+
+            var nodeConnections = Mocks.DynamicMock<INodeConnections>();
+
+            nodeConnections.Expect(v => v.RemoveNodeFromConnections(ipAddress)).Return(NodeConnectionStatus.Removed);
+
+            var args = new NodeAnnoucementEventArgs
+            {
+                Address = ipAddress
+            };
+
+            Mocks.ReplayAll();
+
+            var connectionHandler = CreateConnectionsHandler();
+
+            connectionHandler.AnnouncementService = announcementService;
+            connectionHandler.Connections = nodeConnections;
+
+            connectionHandler.Start();
+
+            announcementService.Raise(v => v.OnOfflineEvent += null, this, args);
+
+            Mocks.ReplayAll();
+
+            Thread.Sleep(100);
         }
 
         [Test]

@@ -124,6 +124,7 @@ namespace FatCatNode.Logic
 
         private void OnOfflineEvent(object sender, NodeAnnoucementEventArgs e)
         {
+            Connections.RemoveNodeFromConnections(e.Address);
         }
     }
 }
