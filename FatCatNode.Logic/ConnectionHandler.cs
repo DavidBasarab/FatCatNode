@@ -6,20 +6,20 @@ using FatCatNode.Logic.Interfaces;
 
 namespace FatCatNode.Logic
 {
-    [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single)]
-    public class Node : INode
+    
+    public class ConnectionHandler
     {
         private IAnnouncementService _announcementService;
         private IServiceHostHelper _serviceHostHelper;
 
-        public Node(string nodeId, IMessageWriter messageWriter)
+        public ConnectionHandler(string nodeId, IMessageWriter messageWriter)
         {
             MessageWriter = messageWriter;
 
             SetNodeId(nodeId);
         }
 
-        public Node(string nodeId)
+        public ConnectionHandler(string nodeId)
         {
             SetNodeId(nodeId);
         }
@@ -34,6 +34,18 @@ namespace FatCatNode.Logic
         }
 
         public INodeConnections Connections { get; set; }
+
+        private INode _connectedNode;
+        public INode ConnectedNode
+        {
+            get { return _connectedNode ?? (_connectedNode = new ConnectedNode()); }
+            set { _connectedNode = value; }
+        }
+
+        private void CreateConnectedNode()
+        {
+            _connectedNode = new ConnectedNode();
+        }
 
         public IAnnouncementService AnnouncementService
         {
@@ -65,14 +77,19 @@ namespace FatCatNode.Logic
 
             MakeServiceAnnoucement();
 
-            TimeHelper.Helper.Sleep(400);
+            SleepForServiceAnnouncement();
 
             OpenServiceHost();
         }
 
+        private void SleepForServiceAnnouncement()
+        {
+            TimeHelper.Helper.Sleep(400);
+        }
+
         private void OpenServiceHost()
         {
-            ServiceHostHelper.OpenServiceHost(this, BaseAddress);
+            ServiceHostHelper.OpenServiceHost(ConnectedNode, BaseAddress);
         }
 
         private void MakeServiceAnnoucement()

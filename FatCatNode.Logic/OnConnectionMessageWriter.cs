@@ -4,9 +4,9 @@ namespace FatCatNode.Logic
 {
     internal class OnConnectionMessageWriter
     {
-        public OnConnectionMessageWriter(Node node, NodeConnectionStatus connectionStatus, IPAddress address)
+        public OnConnectionMessageWriter(ConnectionHandler connectionHandler, NodeConnectionStatus connectionStatus, IPAddress address)
         {
-            Node = node;
+            ConnectionHandler = connectionHandler;
             ConnectionStatus = connectionStatus;
             IpAddress = address;
 
@@ -16,7 +16,7 @@ namespace FatCatNode.Logic
         private NodeConnectionStatus ConnectionStatus { get; set; }
         private IPAddress IpAddress { get; set; }
 
-        private Node Node { get; set; }
+        private ConnectionHandler ConnectionHandler { get; set; }
 
         private void WriteConnectionMessage()
         {
@@ -52,14 +52,14 @@ namespace FatCatNode.Logic
         private void WriteSuccessfullyConnectionMessage()
         {
             WriteMessage("A node with Id '{0}' connected from address {1}",
-                         Node.Connections.FindNodeIdByAddress(IpAddress), IpAddress);
+                         ConnectionHandler.Connections.FindNodeIdByAddress(IpAddress), IpAddress);
         }
 
         private void WriteMessage(string message, params object[] args)
         {
-            if (Node.MessageWriter != null)
+            if (ConnectionHandler.MessageWriter != null)
             {
-                Node.MessageWriter.Message(message, args);
+                ConnectionHandler.MessageWriter.Message(message, args);
             }
         }
 
@@ -70,7 +70,7 @@ namespace FatCatNode.Logic
 
         private void WriteAlreadyConnectedMessage()
         {
-            string nodeId = Node.Connections.FindNodeIdByAddress(IpAddress);
+            string nodeId = ConnectionHandler.Connections.FindNodeIdByAddress(IpAddress);
 
             WriteMessage("A node from address {0} is already connected with an Id of {1}.", IpAddress, nodeId);
         }

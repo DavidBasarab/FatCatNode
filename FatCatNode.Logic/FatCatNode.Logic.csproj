@@ -45,6 +45,7 @@
     <Compile Include="AddressHelper.cs" />
     <Compile Include="Arguments\NodeAnnoucementEventArgs.cs" />
     <Compile Include="Common.cs" />
+    <Compile Include="ConnectedNode.cs" />
     <Compile Include="Interfaces\IAddressHelper.cs" />
     <Compile Include="Interfaces\IAnnouncementService.cs" />
     <Compile Include="Interfaces\IMessageWriter.cs" />
@@ -52,7 +53,7 @@
     <Compile Include="Interfaces\INodeConnections.cs" />
     <Compile Include="Interfaces\IServiceHostHelper.cs" />
     <Compile Include="Interfaces\ITimeHelper.cs" />
-    <Compile Include="Node.cs" />
+    <Compile Include="ConnectionHandler.cs" />
     <Compile Include="NodeAnnouncementService.cs" />
     <Compile Include="OnConnectionMessageWriter.cs" />
     <Compile Include="NodeListener.cs" />

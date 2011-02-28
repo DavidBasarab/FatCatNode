@@ -106,9 +106,9 @@ namespace FatCatNode.Tests
 
             AddressHelper.Helper = addressHelper;
 
-            var node = new Node(NodeId);
+            var connectionHandler = new ConnectionHandler(NodeId);
 
-            Assert.That(node.BaseAddress, Is.EqualTo(desiredBaseAddress));
+            Assert.That(connectionHandler.BaseAddress, Is.EqualTo(desiredBaseAddress));
         }
 
         [Test]
@@ -137,14 +137,14 @@ namespace FatCatNode.Tests
 
             Mocks.ReplayAll();
 
-            var node = new Node(NodeId, messageWriter)
+            var connectionHandler = new ConnectionHandler(NodeId, messageWriter)
                            {
                                Connections = nodeConnections,
                                AnnouncementService = announcementService,
                                ServiceHostHelper = serviceHostHelper
                            };
 
-            node.Start();
+            connectionHandler.Start();
 
             announcementService.Raise(v => v.OnOnlineEvent += null, this, args);
 
@@ -179,14 +179,14 @@ namespace FatCatNode.Tests
 
             Mocks.ReplayAll();
 
-            var node = new Node(NodeId, messageWriter)
+            var connectionHandler = new ConnectionHandler(NodeId, messageWriter)
             {
                 Connections = nodeConnections,
                 AnnouncementService = announcementService,
                 ServiceHostHelper = serviceHostHelper
             };
 
-            node.Start();
+            connectionHandler.Start();
 
             announcementService.Raise(v => v.OnOnlineEvent += null, this, args);
 
@@ -213,13 +213,13 @@ namespace FatCatNode.Tests
 
             Mocks.ReplayAll();
 
-            var node = new Node(NodeId)
+            var connectionHandler = new ConnectionHandler(NodeId)
                            {
                                ServiceHostHelper = serviceHostHelper,
                                AnnouncementService = announcementService
                            };
 
-            node.Start();
+            connectionHandler.Start();
         }
 
         [Test]
@@ -229,17 +229,21 @@ namespace FatCatNode.Tests
 
             Mocks.ReplayAll();
 
-            var node = CreateNode();
+            INode connectedNode = Mocks.DynamicMock<INode>();
+
+            var connectionHandler = CreateNode();
+
+            connectionHandler.ConnectedNode = connectedNode;
 
             var serviceHostHelper = Mocks.DynamicMock<IServiceHostHelper>();
 
-            serviceHostHelper.Expect(v => v.OpenServiceHost(node, node.BaseAddress));
+            serviceHostHelper.Expect(v => v.OpenServiceHost(connectedNode, connectionHandler.BaseAddress));
 
             Mocks.ReplayAll();
 
-            node.ServiceHostHelper = serviceHostHelper;
+            connectionHandler.ServiceHostHelper = serviceHostHelper;
 
-            node.Start();
+            connectionHandler.Start();
         }
 
         private void CreateAddressHelperReturningBaseAddress()
@@ -284,17 +288,17 @@ namespace FatCatNode.Tests
             
             Mocks.ReplayAll();
 
-            var node = CreateNode();
+            var connectionHandler = CreateNode();
 
-            node.AnnouncementService = announcementService;
-            node.ServiceHostHelper = serviceHostHelper;
+            connectionHandler.AnnouncementService = announcementService;
+            connectionHandler.ServiceHostHelper = serviceHostHelper;
 
-            node.Start();
+            connectionHandler.Start();
         }
 
-        private Node CreateNode()
+        private ConnectionHandler CreateNode()
         {
-            return new Node(NodeId);
+            return new ConnectionHandler(NodeId);
         }
 
         [Test]
@@ -318,14 +322,14 @@ namespace FatCatNode.Tests
 
             Mocks.ReplayAll();
 
-            var node = new Node(NodeId)
+            var connectionHandler = new ConnectionHandler(NodeId)
                            {
                                Connections = nodeConnections,
                                AnnouncementService = announcementService,
                                ServiceHostHelper = serviceHostHelper
                            };
 
-            node.Start();
+            connectionHandler.Start();
 
             announcementService.Raise(v => v.OnOnlineEvent += null, this, args);
 
@@ -345,9 +349,9 @@ namespace FatCatNode.Tests
 
             AddressHelper.Helper = addressHelper;
 
-            var node = new Node(NodeId);
+            var connectionHandler = new ConnectionHandler(NodeId);
 
-            Assert.That(node.Id, Is.EqualTo(NodeId));
+            Assert.That(connectionHandler.Id, Is.EqualTo(NodeId));
         }
 
         [Test]
@@ -376,14 +380,14 @@ namespace FatCatNode.Tests
 
             Mocks.ReplayAll();
 
-            var node = new Node(NodeId, messageWriter)
+            var connectionHandler = new ConnectionHandler(NodeId, messageWriter)
                            {
                                Connections = nodeConnections,
                                AnnouncementService = announcementService,
                                ServiceHostHelper = serviceHostHelper
                            };
 
-            node.Start();
+            connectionHandler.Start();
 
             announcementService.Raise(v => v.OnOnlineEvent += null, this, args);
 
