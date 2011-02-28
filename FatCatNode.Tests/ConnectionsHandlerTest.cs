@@ -390,6 +390,51 @@ namespace FatCatNode.Tests
         }
 
         [Test]
+        public void OnANodeDisconnectNodeWillBeWrittenToStatusWriter()
+        {
+            StubAddressHelper();
+
+            IAnnouncementService announcementService = Mocks.DynamicMock<IAnnouncementService>();
+
+            announcementService.OnOfflineEvent += null;
+            LastCall.IgnoreArguments();
+
+            announcementService.OnOnlineEvent += null;
+            LastCall.IgnoreArguments();
+
+            IPAddress ipAddress = IPAddress.Parse("55.55.55.55");
+
+            var nodeConnections = Mocks.DynamicMock<INodeConnections>();
+
+            nodeConnections.Expect(v => v.FindNodeIdByAddress(ipAddress)).Return("Node2");
+            nodeConnections.Expect(v => v.RemoveNodeFromConnections(ipAddress)).Return(NodeConnectionStatus.Removed);
+
+            IMessageWriter messageWriter = Mocks.DynamicMock<IMessageWriter>();
+
+            messageWriter.Expect(v => v.Message("Node Id {0} at address {1} has disconnected.", "Node2", ipAddress));
+
+            var args = new NodeAnnoucementEventArgs
+            {
+                Address = ipAddress
+            };
+
+            Mocks.ReplayAll();
+
+            ConnectionsHandler connectionHandler = new ConnectionsHandler(NodeId, messageWriter);
+
+            connectionHandler.AnnouncementService = announcementService;
+            connectionHandler.Connections = nodeConnections;
+
+            connectionHandler.Start();
+
+            announcementService.Raise(v => v.OnOfflineEvent += null, this, args);
+
+            Mocks.ReplayAll();
+
+            Thread.Sleep(100);
+        }
+
+        [Test]
         public void OnSuccessfullyConnectionAMessageWillBeSentToMessageWriter()
         {
             StubHelpers(HelperFlags.Address);

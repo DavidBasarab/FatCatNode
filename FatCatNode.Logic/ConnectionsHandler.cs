@@ -9,6 +9,7 @@ namespace FatCatNode.Logic
     {
         private IAnnouncementService _announcementService;
         private INode _connectedNode;
+        private DisconnectionNodeHandler _disconnectionNodeHandler;
         private IServiceHostHelper _serviceHostHelper;
         private ITimeHelper _timeHelper;
 
@@ -59,6 +60,14 @@ namespace FatCatNode.Logic
             set { _serviceHostHelper = value; }
         }
 
+        public DisconnectionNodeHandler DisconnectionNodeHandler
+        {
+            get
+            {
+                return _disconnectionNodeHandler ?? (_disconnectionNodeHandler = new DisconnectionNodeHandler(Connections, MessageWriter));
+            }
+        }
+
         private void Initialize()
         {
             RegisterForOfflineAndOnLineEvents();
@@ -100,7 +109,7 @@ namespace FatCatNode.Logic
         private void RegisterForOfflineAndOnLineEvents()
         {
             AnnouncementService.OnOnlineEvent += OnOnlineEvent;
-            AnnouncementService.OnOfflineEvent += OnOfflineEvent;
+            AnnouncementService.OnOfflineEvent += DisconnectionNodeHandler.DisconnectNode;
         }
 
         private void OnOnlineEvent(object sender, NodeAnnoucementEventArgs e)
@@ -120,11 +129,6 @@ namespace FatCatNode.Logic
             var onConnectionMessageWriter = new OnConnectionMessageWriter(this, connectionStatus, address);
 
             onConnectionMessageWriter.WriteConnectionMessage();
-        }
-
-        private void OnOfflineEvent(object sender, NodeAnnoucementEventArgs e)
-        {
-            Connections.RemoveNodeFromConnections(e.Address);
         }
     }
 }
