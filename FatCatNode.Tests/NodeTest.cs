@@ -12,8 +12,6 @@ namespace FatCatNode.Tests
     [TestFixture]
     public class NodeTest
     {
-        private static readonly Uri BaseAddress = new Uri("http://10.30.55.55:7777/UnitTestNode/FatCatNode");
-
         #region Setup/Teardown
 
         [SetUp]
@@ -22,11 +20,6 @@ namespace FatCatNode.Tests
             CreateMockRepository();
 
             StubTimeHelper();
-        }
-
-        private void CreateMockRepository()
-        {
-            Mocks = new MockRepository();
         }
 
         [TearDown]
@@ -38,6 +31,13 @@ namespace FatCatNode.Tests
         }
 
         #endregion
+
+        private static readonly Uri BaseAddress = new Uri("http://10.30.55.55:7777/UnitTestNode/FatCatNode");
+
+        private void CreateMockRepository()
+        {
+            Mocks = new MockRepository();
+        }
 
         private const string NodeId = "UnitTestNode";
 
@@ -65,7 +65,7 @@ namespace FatCatNode.Tests
 
         private void StubTimeHelper()
         {
-            ITimeHelper timeHelper = Mocks.Stub<ITimeHelper>();
+            var timeHelper = Mocks.Stub<ITimeHelper>();
 
             TimeHelper.Helper = timeHelper;
         }
@@ -84,11 +84,60 @@ namespace FatCatNode.Tests
             return serviceHostStub;
         }
 
-        private IAnnouncementService StubAnnoucementService()
+        private void CreateAddressHelperReturningBaseAddress()
         {
+            var addressHelper = Mocks.DynamicMock<IAddressHelper>();
+
+            addressHelper.Expect(v => v.FindBaseAddress()).Return(BaseAddress);
+
+            AddressHelper.Helper = addressHelper;
+        }
+
+        private static ConnectionHandler CreateNode()
+        {
+            return new ConnectionHandler(NodeId);
+        }
+
+        [Test]
+        public void ANodeIsGoingToConnectAnnounceServiceIsStartedAThreadSleepsBeforeOpening()
+        {
+            var addressHelper = Mocks.DynamicMock<IAddressHelper>();
+
             var announcementService = Mocks.Stub<IAnnouncementService>();
 
-            return announcementService;
+            var timeHelper = Mocks.DynamicMock<ITimeHelper>();
+
+            var serviceHostHelper = Mocks.DynamicMock<IServiceHostHelper>();
+
+            using (Mocks.Ordered())
+            {
+                announcementService.OnOnlineEvent += null;
+                LastCall.IgnoreArguments();
+
+                announcementService.OnOfflineEvent += null;
+                LastCall.IgnoreArguments();
+
+                announcementService.Expect(v => v.Start());
+
+                timeHelper.Expect(v => v.Sleep(400));
+
+                addressHelper.Expect(v => v.FindBaseAddress()).Return(BaseAddress);
+
+                serviceHostHelper.Expect(v => v.OpenServiceHost(null, null)).IgnoreArguments();
+            }
+
+            AddressHelper.Helper = addressHelper;
+
+            Mocks.ReplayAll();
+
+            ConnectionHandler connectionHandler = CreateNode();
+
+            connectionHandler.TimeHelper = timeHelper;
+
+            connectionHandler.AnnouncementService = announcementService;
+            connectionHandler.ServiceHostHelper = serviceHostHelper;
+
+            connectionHandler.Start();
         }
 
         [Test]
@@ -98,7 +147,7 @@ namespace FatCatNode.Tests
 
             addressHelper.Expect(v => v.SetNodeId(NodeId));
 
-            var desiredBaseAddress = BaseAddress;
+            Uri desiredBaseAddress = BaseAddress;
 
             addressHelper.Expect(v => v.FindBaseAddress()).Return(desiredBaseAddress);
 
@@ -138,11 +187,11 @@ namespace FatCatNode.Tests
             Mocks.ReplayAll();
 
             var connectionHandler = new ConnectionHandler(NodeId, messageWriter)
-                           {
-                               Connections = nodeConnections,
-                               AnnouncementService = announcementService,
-                               ServiceHostHelper = serviceHostHelper
-                           };
+                                        {
+                                            Connections = nodeConnections,
+                                            AnnouncementService = announcementService,
+                                            ServiceHostHelper = serviceHostHelper
+                                        };
 
             connectionHandler.Start();
 
@@ -164,9 +213,9 @@ namespace FatCatNode.Tests
             IPAddress ipAddress = IPAddress.Parse("55.55.55.55");
 
             var args = new NodeAnnoucementEventArgs
-            {
-                Address = ipAddress
-            };
+                           {
+                               Address = ipAddress
+                           };
 
             var nodeConnections = Mocks.DynamicMock<INodeConnections>();
 
@@ -175,16 +224,17 @@ namespace FatCatNode.Tests
 
             var messageWriter = Mocks.DynamicMock<IMessageWriter>();
 
-            messageWriter.Expect(v => v.Message("A node from address {0} is already connected with an Id of {1}.", ipAddress, "Node2"));
+            messageWriter.Expect(
+                v => v.Message("A node from address {0} is already connected with an Id of {1}.", ipAddress, "Node2"));
 
             Mocks.ReplayAll();
 
             var connectionHandler = new ConnectionHandler(NodeId, messageWriter)
-            {
-                Connections = nodeConnections,
-                AnnouncementService = announcementService,
-                ServiceHostHelper = serviceHostHelper
-            };
+                                        {
+                                            Connections = nodeConnections,
+                                            AnnouncementService = announcementService,
+                                            ServiceHostHelper = serviceHostHelper
+                                        };
 
             connectionHandler.Start();
 
@@ -214,10 +264,10 @@ namespace FatCatNode.Tests
             Mocks.ReplayAll();
 
             var connectionHandler = new ConnectionHandler(NodeId)
-                           {
-                               ServiceHostHelper = serviceHostHelper,
-                               AnnouncementService = announcementService
-                           };
+                                        {
+                                            ServiceHostHelper = serviceHostHelper,
+                                            AnnouncementService = announcementService
+                                        };
 
             connectionHandler.Start();
         }
@@ -229,9 +279,9 @@ namespace FatCatNode.Tests
 
             Mocks.ReplayAll();
 
-            INode connectedNode = Mocks.DynamicMock<INode>();
+            var connectedNode = Mocks.DynamicMock<INode>();
 
-            var connectionHandler = CreateNode();
+            ConnectionHandler connectionHandler = CreateNode();
 
             connectionHandler.ConnectedNode = connectedNode;
 
@@ -244,61 +294,6 @@ namespace FatCatNode.Tests
             connectionHandler.ServiceHostHelper = serviceHostHelper;
 
             connectionHandler.Start();
-        }
-
-        private void CreateAddressHelperReturningBaseAddress()
-        {
-            var addressHelper = Mocks.DynamicMock<IAddressHelper>();
-
-            addressHelper.Expect(v => v.FindBaseAddress()).Return(BaseAddress);
-
-            AddressHelper.Helper = addressHelper;
-        }
-
-        [Test]
-        public void ANodeIsGoingToConnectAnnounceServiceIsStartedAThreadSleepsBeforeOpening()
-        {
-            var addressHelper = Mocks.DynamicMock<IAddressHelper>();
-
-            IAnnouncementService announcementService = Mocks.Stub<IAnnouncementService>();
-
-            ITimeHelper timeHelper = Mocks.DynamicMock<ITimeHelper>();
-            
-            IServiceHostHelper serviceHostHelper = Mocks.DynamicMock<IServiceHostHelper>();
-
-            using (Mocks.Ordered())
-            {
-                announcementService.OnOnlineEvent += null;
-                LastCall.IgnoreArguments();
-
-                announcementService.OnOfflineEvent += null;
-                LastCall.IgnoreArguments();
-
-                announcementService.Expect(v => v.Start());
-
-                timeHelper.Expect(v => v.Sleep(400));
-
-                addressHelper.Expect(v => v.FindBaseAddress()).Return(BaseAddress);
-
-                serviceHostHelper.Expect(v => v.OpenServiceHost(null, null)).IgnoreArguments(); 
-            }
-
-            AddressHelper.Helper = addressHelper;
-            TimeHelper.Helper = timeHelper;
-            
-            Mocks.ReplayAll();
-
-            var connectionHandler = CreateNode();
-
-            connectionHandler.AnnouncementService = announcementService;
-            connectionHandler.ServiceHostHelper = serviceHostHelper;
-
-            connectionHandler.Start();
-        }
-
-        private ConnectionHandler CreateNode()
-        {
-            return new ConnectionHandler(NodeId);
         }
 
         [Test]
@@ -323,11 +318,11 @@ namespace FatCatNode.Tests
             Mocks.ReplayAll();
 
             var connectionHandler = new ConnectionHandler(NodeId)
-                           {
-                               Connections = nodeConnections,
-                               AnnouncementService = announcementService,
-                               ServiceHostHelper = serviceHostHelper
-                           };
+                                        {
+                                            Connections = nodeConnections,
+                                            AnnouncementService = announcementService,
+                                            ServiceHostHelper = serviceHostHelper
+                                        };
 
             connectionHandler.Start();
 
@@ -381,11 +376,11 @@ namespace FatCatNode.Tests
             Mocks.ReplayAll();
 
             var connectionHandler = new ConnectionHandler(NodeId, messageWriter)
-                           {
-                               Connections = nodeConnections,
-                               AnnouncementService = announcementService,
-                               ServiceHostHelper = serviceHostHelper
-                           };
+                                        {
+                                            Connections = nodeConnections,
+                                            AnnouncementService = announcementService,
+                                            ServiceHostHelper = serviceHostHelper
+                                        };
 
             connectionHandler.Start();
 

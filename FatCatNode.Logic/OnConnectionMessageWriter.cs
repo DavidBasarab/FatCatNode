@@ -9,8 +9,6 @@ namespace FatCatNode.Logic
             ConnectionHandler = connectionHandler;
             ConnectionStatus = connectionStatus;
             IpAddress = address;
-
-            WriteConnectionMessage();
         }
 
         private NodeConnectionStatus ConnectionStatus { get; set; }
@@ -18,7 +16,7 @@ namespace FatCatNode.Logic
 
         private ConnectionHandler ConnectionHandler { get; set; }
 
-        private void WriteConnectionMessage()
+        public void WriteConnectionMessage()
         {
             if (SuccessfullyConnected())
             {

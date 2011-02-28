@@ -1,16 +1,16 @@
 ﻿using System;
 using System.Net;
-using System.ServiceModel;
 using FatCatNode.Logic.Arguments;
 using FatCatNode.Logic.Interfaces;
 
 namespace FatCatNode.Logic
 {
-    
     public class ConnectionHandler
     {
         private IAnnouncementService _announcementService;
+        private INode _connectedNode;
         private IServiceHostHelper _serviceHostHelper;
+        private ITimeHelper _timeHelper;
 
         public ConnectionHandler(string nodeId, IMessageWriter messageWriter)
         {
@@ -35,16 +35,16 @@ namespace FatCatNode.Logic
 
         public INodeConnections Connections { get; set; }
 
-        private INode _connectedNode;
         public INode ConnectedNode
         {
             get { return _connectedNode ?? (_connectedNode = new ConnectedNode()); }
             set { _connectedNode = value; }
         }
 
-        private void CreateConnectedNode()
+        public ITimeHelper TimeHelper
         {
-            _connectedNode = new ConnectedNode();
+            get { return _timeHelper ?? Logic.TimeHelper.Helper; }
+            set { _timeHelper = value; }
         }
 
         public IAnnouncementService AnnouncementService
@@ -84,7 +84,7 @@ namespace FatCatNode.Logic
 
         private void SleepForServiceAnnouncement()
         {
-            TimeHelper.Helper.Sleep(400);
+            TimeHelper.Sleep(400);
         }
 
         private void OpenServiceHost()
@@ -118,14 +118,8 @@ namespace FatCatNode.Logic
         private void WriteOnConnectionMessage(IPAddress address, NodeConnectionStatus connectionStatus)
         {
             var onConnectionMessageWriter = new OnConnectionMessageWriter(this, connectionStatus, address);
-        }
 
-        private void WriteMessage(string message, params object[] args)
-        {
-            if (MessageWriter != null)
-            {
-                MessageWriter.Message(message, args);
-            }
+            onConnectionMessageWriter.WriteConnectionMessage();
         }
 
         private void OnOfflineEvent(object sender, NodeAnnoucementEventArgs e)
