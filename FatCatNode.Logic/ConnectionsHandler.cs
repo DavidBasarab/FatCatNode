@@ -65,6 +65,7 @@ namespace FatCatNode.Logic
             Id = nodeId;
 
             AddressHelper.Helper.SetNodeId(nodeId);
+            NodeConnections.Connections.SetNodeId(nodeId);
         }
 
         public void Start()

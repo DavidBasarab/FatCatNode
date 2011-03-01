@@ -20,6 +20,20 @@ namespace FatCatNode.Tests
             CreateMockRepository();
 
             StubTimeHelper();
+
+            StubNodeConnections();
+
+            StubAddressHelper();
+        }
+
+        private void StubAddressHelper()
+        {
+            AddressHelper.Helper = Mocks.Stub<IAddressHelper>();
+        }
+
+        private void StubNodeConnections()
+        {
+            NodeConnections.Connections = Mocks.Stub<INodeConnections>();
         }
 
         [TearDown]
@@ -70,13 +84,6 @@ namespace FatCatNode.Tests
             var timeHelper = Mocks.Stub<ITimeHelper>();
 
             TimeHelper.Helper = timeHelper;
-        }
-
-        private void StubAddressHelper()
-        {
-            var addressHelper = Mocks.Stub<IAddressHelper>();
-
-            AddressHelper.Helper = addressHelper;
         }
 
         private IServiceHostHelper StubServiceHostHelper()
@@ -445,6 +452,22 @@ namespace FatCatNode.Tests
             Mocks.ReplayAll();
 
             AddressHelper.Helper = addressHelper;
+
+            var connectionHandler = new ConnectionsHandler(NodeId);
+
+            Assert.That(connectionHandler.Id, Is.EqualTo(NodeId));
+        }
+
+        [Test]
+        public void OnCreationNodeWillInformNodeConnectionsOfTheNodeId()
+        {
+            var nodeConnections = Mocks.DynamicMock<INodeConnections>();
+
+            nodeConnections.Expect(v => v.SetNodeId(NodeId));
+
+            Mocks.ReplayAll();
+
+            NodeConnections.Connections = nodeConnections;
 
             var connectionHandler = new ConnectionsHandler(NodeId);
 

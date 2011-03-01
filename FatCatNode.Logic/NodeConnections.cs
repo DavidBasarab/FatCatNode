@@ -29,6 +29,11 @@ namespace FatCatNode.Logic
             throw new NotImplementedException();
         }
 
+        public void SetNodeId(string nodeId)
+        {
+            throw new NotImplementedException();
+        }
+
         private class Nested
         {
             internal static readonly NodeConnections Instance = new NodeConnections();

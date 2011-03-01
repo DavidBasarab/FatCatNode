@@ -13,5 +13,7 @@ namespace FatCatNode.Logic.Interfaces
         string FindNodeIdByAddress(IPAddress address);
 
         NodeConnectionStatus RemoveNodeFromConnections(IPAddress address);
+
+        void SetNodeId(string nodeId);
     }
 }
