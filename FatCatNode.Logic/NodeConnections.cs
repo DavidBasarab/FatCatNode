@@ -8,13 +8,14 @@ namespace FatCatNode.Logic
     {
         private static INodeConnections _overridenConnections;
 
+        private IRemoteNodeConnectionHelper _remoteHelper;
+
         public static INodeConnections Connections
         {
             get { return _overridenConnections ?? (Nested.Instance); }
             set { _overridenConnections = value; }
         }
 
-        private IRemoteNodeConnectionHelper _remoteHelper;
         public IRemoteNodeConnectionHelper RemoteHelper
         {
             get { return _remoteHelper ?? (_remoteHelper = new RemoteConnectionHandler()); }
@@ -33,6 +34,8 @@ namespace FatCatNode.Logic
             }
             catch (Exception)
             {
+                MessageWriter.Writer.Message("Error connecting to node at address {0}.", address);
+
                 return NodeConnectionStatus.CouldNotConnect;
             }
         }

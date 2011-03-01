@@ -81,6 +81,28 @@ namespace FatCatNode.Tests
         }
 
         [Test]
+        public void AnErrorOccuredOnConnectionThenAMessageIsWritten()
+        {
+            IPAddress connectingAddress = IPAddress.Parse("237.237.237.237");
+
+            var remoteNodeConnectionHelper = Mocks.DynamicMock<IRemoteNodeConnectionHelper>();
+
+            remoteNodeConnectionHelper.Expect(v => v.OpenRemoteConnection(connectingAddress)).Throw(new Exception());
+
+            IMessageWriter messageWriter = Mocks.DynamicMock<IMessageWriter>();
+
+            messageWriter.Expect(v => v.Message("Error connecting to node at address {0}.", connectingAddress));
+
+
+            Mocks.ReplayAll();
+
+            NodeConnections.Connections.RemoteHelper = remoteNodeConnectionHelper;
+            MessageWriter.Writer = messageWriter;
+
+            NodeConnectionStatus result = NodeConnections.Connections.AddNodeToConnections(connectingAddress);
+        }
+
+        [Test]
         public void ANodeHasConnectedByAddressTheNodeIsConnected()
         {
             IPAddress connectingAddress = IPAddress.Parse("237.237.237.237");
