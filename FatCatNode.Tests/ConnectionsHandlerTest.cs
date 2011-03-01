@@ -193,7 +193,6 @@ namespace FatCatNode.Tests
 
             var connectionHandler = new ConnectionsHandler(NodeId, messageWriter)
                                         {
-                                            Connections = nodeConnections,
                                             AnnouncementService = announcementService,
                                             ServiceHostHelper = serviceHostHelper
                                         };
@@ -203,6 +202,8 @@ namespace FatCatNode.Tests
             announcementService.Raise(v => v.OnOnlineEvent += null, this, args);
 
             Mocks.ReplayAll();
+
+            NodeConnections.Connections = nodeConnections;
 
             Thread.Sleep(100);
         }
@@ -239,7 +240,6 @@ namespace FatCatNode.Tests
 
             var connectionHandler = new ConnectionsHandler(NodeId, messageWriter)
                                         {
-                                            Connections = nodeConnections,
                                             AnnouncementService = announcementService,
                                             ServiceHostHelper = serviceHostHelper
                                         };
@@ -249,6 +249,8 @@ namespace FatCatNode.Tests
             announcementService.Raise(v => v.OnOnlineEvent += null, this, args);
 
             Mocks.ReplayAll();
+
+            NodeConnections.Connections = nodeConnections;
 
             Thread.Sleep(150);
         }
@@ -335,7 +337,6 @@ namespace FatCatNode.Tests
             ConnectionsHandler connectionHandler = CreateConnectionsHandler();
 
             connectionHandler.AnnouncementService = announcementService;
-            connectionHandler.Connections = nodeConnections;
 
             connectionHandler.Start();
 
@@ -382,8 +383,7 @@ namespace FatCatNode.Tests
 
             var connectionHandler = new ConnectionsHandler(NodeId, messageWriter)
                                         {
-                                            AnnouncementService = announcementService,
-                                            Connections = nodeConnections
+                                            AnnouncementService = announcementService
                                         };
 
             connectionHandler.Start();
@@ -391,6 +391,8 @@ namespace FatCatNode.Tests
             announcementService.Raise(v => v.OnOfflineEvent += null, this, args);
 
             Mocks.ReplayAll();
+
+            NodeConnections.Connections = nodeConnections;
 
             Thread.Sleep(100);
         }
@@ -420,7 +422,6 @@ namespace FatCatNode.Tests
 
             var connectionHandler = new ConnectionsHandler(NodeId)
                                         {
-                                            Connections = nodeConnections,
                                             AnnouncementService = announcementService,
                                             ServiceHostHelper = serviceHostHelper
                                         };
@@ -481,7 +482,6 @@ namespace FatCatNode.Tests
 
             var connectionHandler = new ConnectionsHandler(NodeId, messageWriter)
                                         {
-                                            Connections = nodeConnections,
                                             AnnouncementService = announcementService,
                                             ServiceHostHelper = serviceHostHelper
                                         };

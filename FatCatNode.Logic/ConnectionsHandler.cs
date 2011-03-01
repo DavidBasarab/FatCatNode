@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Net;
-using FatCatNode.Logic.Arguments;
 using FatCatNode.Logic.Interfaces;
 
 namespace FatCatNode.Logic
@@ -33,8 +31,6 @@ namespace FatCatNode.Logic
         {
             get { return AddressHelper.Helper.FindBaseAddress(); }
         }
-
-        public INodeConnections Connections { get; set; }
 
         public INode ConnectedNode
         {
@@ -117,25 +113,6 @@ namespace FatCatNode.Logic
         {
             AnnouncementService.OnOnlineEvent += OnNodeConnectionHandler.ConnectNode;
             AnnouncementService.OnOfflineEvent += DisconnectionNodeHandler.DisconnectNode;
-        }
-
-        private void OnOnlineEvent(object sender, NodeAnnoucementEventArgs e)
-        {
-            AddToConnections(e.Address);
-        }
-
-        private void AddToConnections(IPAddress address)
-        {
-            NodeConnectionStatus connectionStatus = Connections.AddNodeToConnections(address);
-
-            WriteOnConnectionMessage(address, connectionStatus);
-        }
-
-        private void WriteOnConnectionMessage(IPAddress address, NodeConnectionStatus connectionStatus)
-        {
-            var onConnectionMessageWriter = new OnConnectionMessageWriter(connectionStatus, address);
-
-            onConnectionMessageWriter.WriteConnectionMessage();
         }
     }
 }
