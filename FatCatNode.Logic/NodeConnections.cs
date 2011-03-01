@@ -25,7 +25,7 @@ namespace FatCatNode.Logic
 
         public NodeConnectionStatus AddNodeToConnections(IPAddress address)
         {
-            ConnectionHandshake connectionHandshake = new ConnectionHandshake(address, RemoteHelper);
+            ConnectionHandshake connectionHandshake = new ConnectionHandshake(address, RemoteHelper, NodeId);
 
             return connectionHandshake.PerformHandshake();
         }
@@ -40,9 +40,11 @@ namespace FatCatNode.Logic
             throw new NotImplementedException();
         }
 
+        public string NodeId { get; set; }
+
         public void SetNodeId(string nodeId)
         {
-            throw new NotImplementedException();
+            NodeId = nodeId;
         }
 
         private class Nested

@@ -6,14 +6,21 @@ namespace FatCatNode.Logic
 {
     public class ConnectionHandshake
     {
-        public ConnectionHandshake(IPAddress address, IRemoteNodeConnectionHelper remoteConnection)
+        public ConnectionHandshake(IPAddress address, IRemoteNodeConnectionHelper remoteConnection, string nodeId)
         {
             Address = address;
             RemoteConnection = remoteConnection;
+            NodeId = nodeId;
         }
+
+        public string NodeId { get; set; }
 
         private IRemoteNodeConnectionHelper RemoteConnection { get; set; }
         private IPAddress Address { get; set; }
+
+        public INode RemoteNode { get; set; }
+
+        public string RemoteNodeId { get; set; }
 
         public NodeConnectionStatus PerformHandshake()
         {
@@ -21,7 +28,9 @@ namespace FatCatNode.Logic
             {
                 WriteAttemptingConnectionMessage();
 
-                RemoteConnection.OpenRemoteConnection(Address);
+                RemoteNode = RemoteConnection.OpenRemoteConnection(Address);
+
+                RemoteNodeId = RemoteNode.Handshake(NodeId);
 
                 return NodeConnectionStatus.None;
             }

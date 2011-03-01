@@ -43,15 +43,13 @@ namespace FatCatNode.Tests
         [Test]
         public void ANodeHasConnectedByAddressBeforeNodeConnectedMessageIsWritten()
         {
-            IPAddress connectingAddress = IPAddress.Parse("237.237.237.237");
-
             var remoteNodeConnectionHelper = Mocks.DynamicMock<IRemoteNodeConnectionHelper>();
 
-            remoteNodeConnectionHelper.Expect(v => v.OpenRemoteConnection(connectingAddress)).Return(null);
+            remoteNodeConnectionHelper.Expect(v => v.OpenRemoteConnection(ConnectionAddress)).Return(null);
 
             var messageWriter = Mocks.DynamicMock<IMessageWriter>();
 
-            messageWriter.Expect(v => v.Message("Attempting to connect to node at address {0}.", connectingAddress));
+            messageWriter.Expect(v => v.Message("Attempting to connect to node at address {0}.", ConnectionAddress));
 
             Mocks.ReplayAll();
 
@@ -59,23 +57,21 @@ namespace FatCatNode.Tests
 
             NodeConnections.Connections.RemoteHelper = remoteNodeConnectionHelper;
 
-            NodeConnections.Connections.AddNodeToConnections(connectingAddress);
+            NodeConnections.Connections.AddNodeToConnections(ConnectionAddress);
         }
 
         [Test]
         public void ANodeHasConnectedByAddressTheNodeConnectionAttemptThrowsExceptionCouldNotConnectStatusReturned()
         {
-            IPAddress connectingAddress = IPAddress.Parse("237.237.237.237");
-
             var remoteNodeConnectionHelper = Mocks.DynamicMock<IRemoteNodeConnectionHelper>();
 
-            remoteNodeConnectionHelper.Expect(v => v.OpenRemoteConnection(connectingAddress)).Throw(new Exception());
+            remoteNodeConnectionHelper.Expect(v => v.OpenRemoteConnection(ConnectionAddress)).Throw(new Exception());
 
             Mocks.ReplayAll();
 
             NodeConnections.Connections.RemoteHelper = remoteNodeConnectionHelper;
 
-            NodeConnectionStatus result = NodeConnections.Connections.AddNodeToConnections(connectingAddress);
+            NodeConnectionStatus result = NodeConnections.Connections.AddNodeToConnections(ConnectionAddress);
 
             Assert.That(result, Is.EqualTo(NodeConnectionStatus.CouldNotConnect));
         }
@@ -83,15 +79,13 @@ namespace FatCatNode.Tests
         [Test]
         public void AnErrorOccuredOnConnectionThenAMessageIsWritten()
         {
-            IPAddress connectingAddress = IPAddress.Parse("237.237.237.237");
+           var remoteNodeConnectionHelper = Mocks.DynamicMock<IRemoteNodeConnectionHelper>();
 
-            var remoteNodeConnectionHelper = Mocks.DynamicMock<IRemoteNodeConnectionHelper>();
-
-            remoteNodeConnectionHelper.Expect(v => v.OpenRemoteConnection(connectingAddress)).Throw(new Exception());
+           remoteNodeConnectionHelper.Expect(v => v.OpenRemoteConnection(ConnectionAddress)).Throw(new Exception());
 
             IMessageWriter messageWriter = Mocks.DynamicMock<IMessageWriter>();
 
-            messageWriter.Expect(v => v.Message("Error connecting to node at address {0}.", connectingAddress));
+            messageWriter.Expect(v => v.Message("Error connecting to node at address {0}.", ConnectionAddress));
 
 
             Mocks.ReplayAll();
@@ -99,23 +93,49 @@ namespace FatCatNode.Tests
             NodeConnections.Connections.RemoteHelper = remoteNodeConnectionHelper;
             MessageWriter.Writer = messageWriter;
 
-            NodeConnectionStatus result = NodeConnections.Connections.AddNodeToConnections(connectingAddress);
+            NodeConnections.Connections.AddNodeToConnections(ConnectionAddress);
         }
 
         [Test]
         public void ANodeHasConnectedByAddressTheNodeIsConnected()
         {
-            IPAddress connectingAddress = IPAddress.Parse("237.237.237.237");
-
             var remoteNodeConnectionHelper = Mocks.DynamicMock<IRemoteNodeConnectionHelper>();
 
-            remoteNodeConnectionHelper.Expect(v => v.OpenRemoteConnection(connectingAddress)).Return(null);
+            remoteNodeConnectionHelper.Expect(v => v.OpenRemoteConnection(ConnectionAddress)).Return(null);
 
             Mocks.ReplayAll();
 
             NodeConnections.Connections.RemoteHelper = remoteNodeConnectionHelper;
 
-            NodeConnections.Connections.AddNodeToConnections(connectingAddress);
+            NodeConnections.Connections.AddNodeToConnections(ConnectionAddress);
+        }
+
+        public IPAddress ConnectionAddress
+        {
+            get
+            {
+                return IPAddress.Parse("237.237.237.237");
+            }
+        }
+
+        [Test]
+        public void UsingNodeConnectionHandshakeIsCalledNodeIdIsReturned()
+        {
+            var remoteNodeConnectionHelper = Mocks.DynamicMock<IRemoteNodeConnectionHelper>();
+
+            INode otherNode = Mocks.DynamicMock<INode>();
+
+            remoteNodeConnectionHelper.Expect(v => v.OpenRemoteConnection(ConnectionAddress)).Return(otherNode);
+
+            otherNode.Expect(v => v.Handshake("Node2"));
+            
+            Mocks.ReplayAll();
+
+            NodeConnections.Connections.RemoteHelper = remoteNodeConnectionHelper;
+
+            NodeConnections.Connections.SetNodeId("Node2");
+
+            NodeConnections.Connections.AddNodeToConnections(ConnectionAddress);
         }
     }
 }
