@@ -27,7 +27,7 @@ namespace FatCatNode.Logic
         {
             ConnectionHandshake connectionHandshake = new ConnectionHandshake(address, RemoteHelper);
 
-            connectionHandshake.PerformHandshake();
+            return connectionHandshake.PerformHandshake();
         }
 
         public string FindNodeIdByAddress(IPAddress address)

@@ -1,28 +1,25 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
-using System.Text;
 using FatCatNode.Logic.Interfaces;
 
 namespace FatCatNode.Logic
 {
     public class ConnectionHandshake
     {
-        private IRemoteNodeConnectionHelper RemoteConnection { get; set; }
-        private IPAddress Address { get; set; }
-
         public ConnectionHandshake(IPAddress address, IRemoteNodeConnectionHelper remoteConnection)
         {
             Address = address;
             RemoteConnection = remoteConnection;
         }
 
+        private IRemoteNodeConnectionHelper RemoteConnection { get; set; }
+        private IPAddress Address { get; set; }
+
         public NodeConnectionStatus PerformHandshake()
         {
             try
             {
-                MessageWriter.Writer.Message("Attempting to connect to node at address {0}.", Address);
+                WriteAttemptingConnectionMessage();
 
                 RemoteConnection.OpenRemoteConnection(Address);
 
@@ -30,10 +27,20 @@ namespace FatCatNode.Logic
             }
             catch (Exception)
             {
-                MessageWriter.Writer.Message("Error connecting to node at address {0}.", Address);
+                WriteConnectionErrorMessage();
 
                 return NodeConnectionStatus.CouldNotConnect;
             }
+        }
+
+        private void WriteConnectionErrorMessage()
+        {
+            MessageWriter.Writer.Message("Error connecting to node at address {0}.", Address);
+        }
+
+        private void WriteAttemptingConnectionMessage()
+        {
+            MessageWriter.Writer.Message("Attempting to connect to node at address {0}.", Address);
         }
     }
 }
