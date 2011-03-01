@@ -64,7 +64,7 @@ namespace FatCatNode.Logic
         {
             get
             {
-                return _disconnectionNodeHandler ?? (_disconnectionNodeHandler = new DisconnectionNodeHandler(Connections, MessageWriter));
+                return _disconnectionNodeHandler ?? (_disconnectionNodeHandler = new DisconnectionNodeHandler());
             }
         }
 
