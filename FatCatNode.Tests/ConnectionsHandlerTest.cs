@@ -191,7 +191,7 @@ namespace FatCatNode.Tests
             NodeConnections.Connections = nodeConnections;
             MessageWriter.Writer = messageWriter;
 
-            var connectionHandler = new ConnectionsHandler(NodeId, messageWriter)
+            var connectionHandler = new ConnectionsHandler(NodeId)
                                         {
                                             AnnouncementService = announcementService,
                                             ServiceHostHelper = serviceHostHelper
@@ -238,7 +238,7 @@ namespace FatCatNode.Tests
             NodeConnections.Connections = nodeConnections;
             MessageWriter.Writer = messageWriter;
 
-            var connectionHandler = new ConnectionsHandler(NodeId, messageWriter)
+            var connectionHandler = new ConnectionsHandler(NodeId)
                                         {
                                             AnnouncementService = announcementService,
                                             ServiceHostHelper = serviceHostHelper
@@ -381,7 +381,7 @@ namespace FatCatNode.Tests
             NodeConnections.Connections = nodeConnections;
             MessageWriter.Writer = messageWriter;
 
-            var connectionHandler = new ConnectionsHandler(NodeId, messageWriter)
+            var connectionHandler = new ConnectionsHandler(NodeId)
                                         {
                                             AnnouncementService = announcementService
                                         };
@@ -480,7 +480,7 @@ namespace FatCatNode.Tests
             NodeConnections.Connections = nodeConnections;
             MessageWriter.Writer = messageWriter;
 
-            var connectionHandler = new ConnectionsHandler(NodeId, messageWriter)
+            var connectionHandler = new ConnectionsHandler(NodeId)
                                         {
                                             AnnouncementService = announcementService,
                                             ServiceHostHelper = serviceHostHelper

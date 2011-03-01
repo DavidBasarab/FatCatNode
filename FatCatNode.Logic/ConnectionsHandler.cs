@@ -11,19 +11,10 @@ namespace FatCatNode.Logic
         private IServiceHostHelper _serviceHostHelper;
         private ITimeHelper _timeHelper;
 
-        public ConnectionsHandler(string nodeId, IMessageWriter messageWriter)
-        {
-            MessageWriter = messageWriter;
-
-            SetNodeId(nodeId);
-        }
-
         public ConnectionsHandler(string nodeId)
         {
             SetNodeId(nodeId);
         }
-
-        public IMessageWriter MessageWriter { get; private set; }
 
         public string Id { get; set; }
 
