@@ -494,6 +494,5 @@ namespace FatCatNode.Tests
 
             Thread.Sleep(100);
         }
-
     }
 }
