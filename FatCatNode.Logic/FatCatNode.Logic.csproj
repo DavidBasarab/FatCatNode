@@ -52,6 +52,7 @@
     <Compile Include="Interfaces\IMessageWriter.cs" />
     <Compile Include="Interfaces\INode.cs" />
     <Compile Include="Interfaces\INodeConnections.cs" />
+    <Compile Include="Interfaces\IRemoteNodeConnectionHelper.cs" />
     <Compile Include="Interfaces\IServiceHostHelper.cs" />
     <Compile Include="Interfaces\ITimeHelper.cs" />
     <Compile Include="ConnectionsHandler.cs" />
@@ -62,6 +63,7 @@
     <Compile Include="NodeListener.cs" />
     <Compile Include="OnNodeConnectionHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RemoteConnectionHandler.cs" />
     <Compile Include="ServiceHostHelper.cs" />
     <Compile Include="TimeHelper.cs" />
   </ItemGroup>

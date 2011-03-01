@@ -15,5 +15,7 @@ namespace FatCatNode.Logic.Interfaces
         NodeConnectionStatus RemoveNodeFromConnections(IPAddress address);
 
         void SetNodeId(string nodeId);
+
+        IRemoteNodeConnectionHelper RemoteHelper { get; set; }
     }
 }

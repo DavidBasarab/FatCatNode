@@ -14,9 +14,27 @@ namespace FatCatNode.Logic
             set { _overridenConnections = value; }
         }
 
+        private IRemoteNodeConnectionHelper _remoteHelper;
+        public IRemoteNodeConnectionHelper RemoteHelper
+        {
+            get { return _remoteHelper ?? (_remoteHelper = new RemoteConnectionHandler()); }
+            set { _remoteHelper = value; }
+        }
+
         public NodeConnectionStatus AddNodeToConnections(IPAddress address)
         {
-            throw new NotImplementedException();
+            try
+            {
+                MessageWriter.Writer.Message("Attempting to connect to node at address {0}.", address);
+
+                RemoteHelper.OpenRemoteConnection(address);
+
+                return NodeConnectionStatus.None;
+            }
+            catch (Exception)
+            {
+                return NodeConnectionStatus.CouldNotConnect;
+            }
         }
 
         public string FindNodeIdByAddress(IPAddress address)

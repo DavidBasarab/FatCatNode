@@ -26,16 +26,6 @@ namespace FatCatNode.Tests
             StubAddressHelper();
         }
 
-        private void StubAddressHelper()
-        {
-            AddressHelper.Helper = Mocks.Stub<IAddressHelper>();
-        }
-
-        private void StubNodeConnections()
-        {
-            NodeConnections.Connections = Mocks.Stub<INodeConnections>();
-        }
-
         [TearDown]
         public void TearDown()
         {
@@ -45,6 +35,16 @@ namespace FatCatNode.Tests
         }
 
         #endregion
+
+        private void StubAddressHelper()
+        {
+            AddressHelper.Helper = Mocks.Stub<IAddressHelper>();
+        }
+
+        private void StubNodeConnections()
+        {
+            NodeConnections.Connections = Mocks.Stub<INodeConnections>();
+        }
 
         private static readonly Uri BaseAddress = new Uri("http://10.30.55.55:7777/UnitTestNode/FatCatNode");
 
@@ -443,22 +443,6 @@ namespace FatCatNode.Tests
         }
 
         [Test]
-        public void OnCreationNodeWillInformTheAddressHelperOfTheNodeId()
-        {
-            var addressHelper = Mocks.DynamicMock<IAddressHelper>();
-
-            addressHelper.Expect(v => v.SetNodeId(NodeId));
-
-            Mocks.ReplayAll();
-
-            AddressHelper.Helper = addressHelper;
-
-            var connectionHandler = new ConnectionsHandler(NodeId);
-
-            Assert.That(connectionHandler.Id, Is.EqualTo(NodeId));
-        }
-
-        [Test]
         public void OnCreationNodeWillInformNodeConnectionsOfTheNodeId()
         {
             var nodeConnections = Mocks.DynamicMock<INodeConnections>();
@@ -468,6 +452,22 @@ namespace FatCatNode.Tests
             Mocks.ReplayAll();
 
             NodeConnections.Connections = nodeConnections;
+
+            var connectionHandler = new ConnectionsHandler(NodeId);
+
+            Assert.That(connectionHandler.Id, Is.EqualTo(NodeId));
+        }
+
+        [Test]
+        public void OnCreationNodeWillInformTheAddressHelperOfTheNodeId()
+        {
+            var addressHelper = Mocks.DynamicMock<IAddressHelper>();
+
+            addressHelper.Expect(v => v.SetNodeId(NodeId));
+
+            Mocks.ReplayAll();
+
+            AddressHelper.Helper = addressHelper;
 
             var connectionHandler = new ConnectionsHandler(NodeId);
 

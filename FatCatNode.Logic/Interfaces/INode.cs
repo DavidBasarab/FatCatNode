@@ -9,6 +9,7 @@ namespace FatCatNode.Logic.Interfaces
     [ServiceContract(Namespace = "http://fatcatnode.com/")]
     public interface INode
     {
-        
+        string Handshake(string otherNodeId);
+
     }
 }
