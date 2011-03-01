@@ -1,8 +1,7 @@
 ﻿using System.Net;
 using FatCatNode.Logic.Arguments;
-using FatCatNode.Logic.Interfaces;
 
-namespace FatCatNode.Logic
+namespace FatCatNode.Logic.Handlers
 {
     internal class OnNodeConnectionHandler
     {

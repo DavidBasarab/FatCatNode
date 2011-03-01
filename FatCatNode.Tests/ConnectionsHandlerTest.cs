@@ -3,6 +3,8 @@ using System.Net;
 using System.Threading;
 using FatCatNode.Logic;
 using FatCatNode.Logic.Arguments;
+using FatCatNode.Logic.Handlers;
+using FatCatNode.Logic.Helpers;
 using FatCatNode.Logic.Interfaces;
 using NUnit.Framework;
 using Rhino.Mocks;

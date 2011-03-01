@@ -42,11 +42,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AddressHelper.cs" />
+    <Compile Include="ConnectionHandshake.cs" />
+    <Compile Include="Helpers\AddressHelper.cs" />
     <Compile Include="Arguments\NodeAnnoucementEventArgs.cs" />
     <Compile Include="Common.cs" />
     <Compile Include="ConnectedNode.cs" />
-    <Compile Include="DisconnectionNodeHandler.cs" />
+    <Compile Include="Handlers\DisconnectionNodeHandler.cs" />
     <Compile Include="Interfaces\IAddressHelper.cs" />
     <Compile Include="Interfaces\IAnnouncementService.cs" />
     <Compile Include="Interfaces\IMessageWriter.cs" />
@@ -55,17 +56,17 @@
     <Compile Include="Interfaces\IRemoteNodeConnectionHelper.cs" />
     <Compile Include="Interfaces\IServiceHostHelper.cs" />
     <Compile Include="Interfaces\ITimeHelper.cs" />
-    <Compile Include="ConnectionsHandler.cs" />
+    <Compile Include="Handlers\ConnectionsHandler.cs" />
     <Compile Include="MessageWriter.cs" />
     <Compile Include="NodeAnnouncementService.cs" />
     <Compile Include="NodeConnections.cs" />
     <Compile Include="OnConnectionMessageWriter.cs" />
     <Compile Include="NodeListener.cs" />
-    <Compile Include="OnNodeConnectionHandler.cs" />
+    <Compile Include="Handlers\OnNodeConnectionHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RemoteConnectionHandler.cs" />
-    <Compile Include="ServiceHostHelper.cs" />
-    <Compile Include="TimeHelper.cs" />
+    <Compile Include="Handlers\RemoteConnectionHandler.cs" />
+    <Compile Include="Helpers\ServiceHostHelper.cs" />
+    <Compile Include="Helpers\TimeHelper.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

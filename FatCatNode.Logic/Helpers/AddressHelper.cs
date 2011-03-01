@@ -2,7 +2,7 @@
 using System.Net;
 using FatCatNode.Logic.Interfaces;
 
-namespace FatCatNode.Logic
+namespace FatCatNode.Logic.Helpers
 {
     public class AddressHelper : IAddressHelper
     {

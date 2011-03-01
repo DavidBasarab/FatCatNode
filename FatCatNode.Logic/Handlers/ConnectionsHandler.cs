@@ -1,7 +1,8 @@
 ﻿using System;
+using FatCatNode.Logic.Helpers;
 using FatCatNode.Logic.Interfaces;
 
-namespace FatCatNode.Logic
+namespace FatCatNode.Logic.Handlers
 {
     public class ConnectionsHandler
     {
@@ -31,7 +32,7 @@ namespace FatCatNode.Logic
 
         public ITimeHelper TimeHelper
         {
-            get { return _timeHelper ?? Logic.TimeHelper.Helper; }
+            get { return _timeHelper ?? Helpers.TimeHelper.Helper; }
             set { _timeHelper = value; }
         }
 

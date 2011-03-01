@@ -1,7 +1,7 @@
 ﻿using System;
 using FatCatNode.Logic.Interfaces;
 
-namespace FatCatNode.Logic
+namespace FatCatNode.Logic.Helpers
 {
     public class ServiceHostHelper : IServiceHostHelper
     {

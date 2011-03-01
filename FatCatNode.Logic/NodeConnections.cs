@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net;
+using FatCatNode.Logic.Handlers;
 using FatCatNode.Logic.Interfaces;
 
 namespace FatCatNode.Logic
@@ -24,20 +25,9 @@ namespace FatCatNode.Logic
 
         public NodeConnectionStatus AddNodeToConnections(IPAddress address)
         {
-            try
-            {
-                MessageWriter.Writer.Message("Attempting to connect to node at address {0}.", address);
+            ConnectionHandshake connectionHandshake = new ConnectionHandshake(address, RemoteHelper);
 
-                RemoteHelper.OpenRemoteConnection(address);
-
-                return NodeConnectionStatus.None;
-            }
-            catch (Exception)
-            {
-                MessageWriter.Writer.Message("Error connecting to node at address {0}.", address);
-
-                return NodeConnectionStatus.CouldNotConnect;
-            }
+            connectionHandshake.PerformHandshake();
         }
 
         public string FindNodeIdByAddress(IPAddress address)

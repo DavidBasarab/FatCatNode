@@ -1,6 +1,6 @@
 ﻿using FatCatNode.Logic.Arguments;
 
-namespace FatCatNode.Logic
+namespace FatCatNode.Logic.Handlers
 {
     public class DisconnectionNodeHandler
     {

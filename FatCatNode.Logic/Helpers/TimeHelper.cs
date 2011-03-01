@@ -2,7 +2,7 @@
 using System.Threading;
 using FatCatNode.Logic.Interfaces;
 
-namespace FatCatNode.Logic
+namespace FatCatNode.Logic.Helpers
 {
     public class TimeHelper : ITimeHelper
     {
