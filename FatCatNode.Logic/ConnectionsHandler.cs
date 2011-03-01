@@ -106,9 +106,16 @@ namespace FatCatNode.Logic
             AnnouncementService.Start();
         }
 
+        private OnNodeConnectionHandler _onNodeConnectionHandler;
+
+        private OnNodeConnectionHandler OnNodeConnectionHandler
+        {
+            get { return _onNodeConnectionHandler ?? (_onNodeConnectionHandler = new OnNodeConnectionHandler()); }
+        }
+
         private void RegisterForOfflineAndOnLineEvents()
         {
-            AnnouncementService.OnOnlineEvent += OnOnlineEvent;
+            AnnouncementService.OnOnlineEvent += OnNodeConnectionHandler.ConnectNode;
             AnnouncementService.OnOfflineEvent += DisconnectionNodeHandler.DisconnectNode;
         }
 
@@ -126,7 +133,7 @@ namespace FatCatNode.Logic
 
         private void WriteOnConnectionMessage(IPAddress address, NodeConnectionStatus connectionStatus)
         {
-            var onConnectionMessageWriter = new OnConnectionMessageWriter(this, connectionStatus, address);
+            var onConnectionMessageWriter = new OnConnectionMessageWriter(connectionStatus, address);
 
             onConnectionMessageWriter.WriteConnectionMessage();
         }

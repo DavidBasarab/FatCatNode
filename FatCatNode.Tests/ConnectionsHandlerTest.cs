@@ -45,6 +45,8 @@ namespace FatCatNode.Tests
         {
             AddressHelper.Helper = null;
             TimeHelper.Helper = null;
+            NodeConnections.Connections = null;
+            MessageWriter.Writer = null;
         }
 
         public MockRepository Mocks { get; set; }
@@ -186,6 +188,9 @@ namespace FatCatNode.Tests
 
             Mocks.ReplayAll();
 
+            NodeConnections.Connections = nodeConnections;
+            MessageWriter.Writer = messageWriter;
+
             var connectionHandler = new ConnectionsHandler(NodeId, messageWriter)
                                         {
                                             Connections = nodeConnections,
@@ -228,6 +233,9 @@ namespace FatCatNode.Tests
                 v => v.Message("A node from address {0} is already connected with an Id of {1}.", ipAddress, "Node2"));
 
             Mocks.ReplayAll();
+
+            NodeConnections.Connections = nodeConnections;
+            MessageWriter.Writer = messageWriter;
 
             var connectionHandler = new ConnectionsHandler(NodeId, messageWriter)
                                         {
@@ -316,6 +324,8 @@ namespace FatCatNode.Tests
             nodeConnections.Expect(v => v.AddNodeToConnections(ipAddress)).Return(NodeConnectionStatus.Added);
 
             Mocks.ReplayAll();
+
+            NodeConnections.Connections = nodeConnections;
 
             var connectionHandler = new ConnectionsHandler(NodeId)
                                         {
@@ -459,6 +469,9 @@ namespace FatCatNode.Tests
             messageWriter.Expect(v => v.Message("A node with Id '{0}' connected from address {1}", "Node2", ipAddress));
 
             Mocks.ReplayAll();
+
+            NodeConnections.Connections = nodeConnections;
+            MessageWriter.Writer = messageWriter;
 
             var connectionHandler = new ConnectionsHandler(NodeId, messageWriter)
                                         {
