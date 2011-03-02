@@ -16,6 +16,7 @@ namespace FatCatNode.Logic
         public string NodeId { get; set; }
 
         private IRemoteNodeConnectionHelper RemoteConnection { get; set; }
+        
         private IPAddress Address { get; set; }
 
         public INode RemoteNode { get; set; }
@@ -48,10 +49,25 @@ namespace FatCatNode.Logic
 
         private void DetermineConnectionStatus()
         {
-            if (!string.IsNullOrEmpty(NodeId))
+            if (IsRemoteNodeEmpty())
             {
-                ConnectionStatus = NodeConnectionStatus.Added;
+                ConnectionStatus = NodeConnectionStatus.CouldNotConnect;
             }
+            else if (IsRemoteNodePopulated())
+            {
+                ConnectionStatus = NodeConnectionStatus.Connected;
+            }
+
+        }
+
+        private bool IsRemoteNodePopulated()
+        {
+            return !string.IsNullOrEmpty(RemoteNodeId);
+        }
+
+        private bool IsRemoteNodeEmpty()
+        {
+            return string.IsNullOrEmpty(RemoteNodeId);
         }
 
         private void FindRemoteNodeId()

@@ -423,7 +423,7 @@ namespace FatCatNode.Tests
 
             var nodeConnections = Mocks.DynamicMock<INodeConnections>();
 
-            nodeConnections.Expect(v => v.AddNodeToConnections(ipAddress)).Return(NodeConnectionStatus.Added);
+            nodeConnections.Expect(v => v.AddNodeToConnections(ipAddress)).Return(NodeConnectionStatus.Connected);
 
             Mocks.ReplayAll();
 
@@ -493,7 +493,7 @@ namespace FatCatNode.Tests
 
             var nodeConnections = Mocks.DynamicMock<INodeConnections>();
 
-            nodeConnections.Expect(v => v.AddNodeToConnections(ipAddress)).Return(NodeConnectionStatus.Added);
+            nodeConnections.Expect(v => v.AddNodeToConnections(ipAddress)).Return(NodeConnectionStatus.Connected);
             nodeConnections.Expect(v => v.FindNodeIdByAddress(ipAddress)).Return("Node2");
 
             var messageWriter = Mocks.DynamicMock<IMessageWriter>();

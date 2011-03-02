@@ -31,7 +31,7 @@ namespace FatCatNode.Logic
 
         private bool SuccessfullyConnected()
         {
-            return ConnectionStatus == NodeConnectionStatus.Added;
+            return ConnectionStatus == NodeConnectionStatus.Connected;
         }
 
         private bool DidNotSuccessfullyConnect()

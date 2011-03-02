@@ -157,7 +157,29 @@ namespace FatCatNode.Tests
 
             NodeConnectionStatus connectionStatus = NodeConnections.Connections.AddNodeToConnections(ConnectionAddress);
 
-            Assert.That(connectionStatus, Is.EqualTo(NodeConnectionStatus.Added));
+            Assert.That(connectionStatus, Is.EqualTo(NodeConnectionStatus.Connected));
+        }
+
+        [Test]
+        public void AnEmptyNodeIdIsReturnedNodeConnectionStatusAsNotConnected()
+        {
+            var remoteNodeConnectionHelper = Mocks.DynamicMock<IRemoteNodeConnectionHelper>();
+
+            INode otherNode = Mocks.DynamicMock<INode>();
+
+            remoteNodeConnectionHelper.Expect(v => v.OpenRemoteConnection(ConnectionAddress)).Return(otherNode);
+
+            otherNode.Expect(v => v.Handshake("Node2")).Return(null);
+
+            Mocks.ReplayAll();
+
+            NodeConnections.Connections.RemoteHelper = remoteNodeConnectionHelper;
+
+            NodeConnections.Connections.SetNodeId("Node2");
+
+            NodeConnectionStatus connectionStatus = NodeConnections.Connections.AddNodeToConnections(ConnectionAddress);
+
+            Assert.That(connectionStatus, Is.EqualTo(NodeConnectionStatus.CouldNotConnect));
         }
     }
 }
