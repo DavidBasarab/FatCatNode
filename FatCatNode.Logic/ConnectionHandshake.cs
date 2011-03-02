@@ -22,24 +22,46 @@ namespace FatCatNode.Logic
 
         public string RemoteNodeId { get; set; }
 
+        public NodeConnectionStatus ConnectionStatus { get; set; }
+
         public NodeConnectionStatus PerformHandshake()
         {
             try
             {
                 WriteAttemptingConnectionMessage();
 
-                RemoteNode = RemoteConnection.OpenRemoteConnection(Address);
+                FindRemoteNode();
 
-                RemoteNodeId = RemoteNode.Handshake(NodeId);
+                FindRemoteNodeId();
 
-                return NodeConnectionStatus.None;
+                DetermineConnectionStatus();
             }
             catch (Exception)
             {
                 WriteConnectionErrorMessage();
 
-                return NodeConnectionStatus.CouldNotConnect;
+                ConnectionStatus = NodeConnectionStatus.CouldNotConnect;
             }
+
+            return ConnectionStatus;
+        }
+
+        private void DetermineConnectionStatus()
+        {
+            if (!string.IsNullOrEmpty(NodeId))
+            {
+                ConnectionStatus = NodeConnectionStatus.Added;
+            }
+        }
+
+        private void FindRemoteNodeId()
+        {
+            RemoteNodeId = RemoteNode.Handshake(NodeId);
+        }
+
+        private void FindRemoteNode()
+        {
+            RemoteNode = RemoteConnection.OpenRemoteConnection(Address);
         }
 
         private void WriteConnectionErrorMessage()
