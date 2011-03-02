@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace FatCatNode.Logic
+﻿namespace FatCatNode.Logic
 {
     public enum NodeConnectionStatus
     {
@@ -11,6 +6,7 @@ namespace FatCatNode.Logic
         Connected,
         AlreadyConnected,
         CouldNotConnect,
-        Removed
+        Removed,
+        ErrorInHandShake
     }
 }

@@ -41,7 +41,7 @@ namespace FatCatNode.Logic
             {
                 WriteConnectionErrorMessage();
 
-                ConnectionStatus = NodeConnectionStatus.CouldNotConnect;
+                ConnectionStatus = NodeConnectionStatus.ErrorInHandShake;
             }
 
             return ConnectionStatus;
@@ -57,7 +57,6 @@ namespace FatCatNode.Logic
             {
                 ConnectionStatus = NodeConnectionStatus.Connected;
             }
-
         }
 
         private bool IsRemoteNodePopulated()

@@ -17,6 +17,8 @@ namespace FatCatNode.Logic
             set { _overridenConnections = value; }
         }
 
+        public string NodeId { get; set; }
+
         public IRemoteNodeConnectionHelper RemoteHelper
         {
             get { return _remoteHelper ?? (_remoteHelper = new RemoteConnectionHandler()); }
@@ -25,7 +27,7 @@ namespace FatCatNode.Logic
 
         public NodeConnectionStatus AddNodeToConnections(IPAddress address)
         {
-            ConnectionHandshake connectionHandshake = new ConnectionHandshake(address, RemoteHelper, NodeId);
+            var connectionHandshake = new ConnectionHandshake(address, RemoteHelper, NodeId);
 
             return connectionHandshake.PerformHandshake();
         }
@@ -39,8 +41,6 @@ namespace FatCatNode.Logic
         {
             throw new NotImplementedException();
         }
-
-        public string NodeId { get; set; }
 
         public void SetNodeId(string nodeId)
         {
