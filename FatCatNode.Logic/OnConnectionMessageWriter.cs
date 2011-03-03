@@ -27,6 +27,20 @@ namespace FatCatNode.Logic
             {
                 WriteAlreadyConnectedMessage();
             }
+            else if (ErrorInHandShakeWIthNode())
+            {
+                WriteHandshakeErrorMessage();
+            }
+        }
+
+        private void WriteHandshakeErrorMessage()
+        {
+            WriteMessage("An error in handshake with node at {0}.", IpAddress);
+        }
+
+        private bool ErrorInHandShakeWIthNode()
+        {
+            return ConnectionStatus == NodeConnectionStatus.ErrorInHandShake;
         }
 
         private bool SuccessfullyConnected()

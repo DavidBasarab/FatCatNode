@@ -218,6 +218,104 @@ namespace FatCatNode.Tests
         }
 
         [Test]
+        public void AHandShakeErrorAMessageIsWritten()
+        {
+            StubHelpers(HelperFlags.Address);
+            IServiceHostHelper serviceHostHelper = StubServiceHostHelper();
+
+            var announcementService = Mocks.DynamicMock<IAnnouncementService>();
+
+            IPAddress ipAddress = IPAddress.Parse("55.55.55.55");
+
+            var args = new NodeAnnoucementEventArgs
+            {
+                Address = ipAddress
+            };
+
+            var nodeConnections = Mocks.DynamicMock<INodeConnections>();
+
+            nodeConnections.Expect(v => v.AddNodeToConnections(ipAddress)).Return(NodeConnectionStatus.ErrorInHandShake);
+            nodeConnections.Expect(v => v.FindNodeIdByAddress(ipAddress)).IgnoreArguments().Repeat.Never();
+
+            var messageWriter = Mocks.DynamicMock<IMessageWriter>();
+
+            messageWriter.Expect(v => v.Message("An error in handshake with node at {0}.", ipAddress));
+
+            Mocks.ReplayAll();
+
+            NodeConnections.Connections = nodeConnections;
+            MessageWriter.Writer = messageWriter;
+
+            var connectionHandler = new ConnectionsHandler(NodeId)
+            {
+                AnnouncementService = announcementService,
+                ServiceHostHelper = serviceHostHelper
+            };
+
+            connectionHandler.Start();
+
+            announcementService.Raise(v => v.OnOnlineEvent += null, this, args);
+
+            Mocks.ReplayAll();
+
+            NodeConnections.Connections = nodeConnections;
+
+            Thread.Sleep(100);
+        }
+
+        [Test]
+        public void AHandShakeErrorAfterADelayWillAttemptHandShakeAgain()
+        {
+            StubHelpers(HelperFlags.Address);
+            IServiceHostHelper serviceHostHelper = StubServiceHostHelper();
+
+            var announcementService = Mocks.DynamicMock<IAnnouncementService>();
+
+            IPAddress ipAddress = IPAddress.Parse("55.55.55.55");
+
+            var args = new NodeAnnoucementEventArgs
+            {
+                Address = ipAddress
+            };
+
+            var nodeConnections = Mocks.DynamicMock<INodeConnections>();
+
+            nodeConnections.Expect(v => v.AddNodeToConnections(ipAddress)).Return(NodeConnectionStatus.ErrorInHandShake).Repeat.Twice();
+            nodeConnections.Expect(v => v.FindNodeIdByAddress(ipAddress)).IgnoreArguments().Repeat.Never();
+
+            var messageWriter = Mocks.DynamicMock<IMessageWriter>();
+
+            messageWriter.Expect(v => v.Message("An error in handshake with node at {0}.", ipAddress));
+
+            ITimeHelper timeHelper = Mocks.DynamicMock<ITimeHelper>();
+
+            timeHelper.Expect(v => v.Sleep(750));
+
+            TimeHelper.Helper = timeHelper;
+
+            Mocks.ReplayAll();
+
+            NodeConnections.Connections = nodeConnections;
+            MessageWriter.Writer = messageWriter;
+
+            var connectionHandler = new ConnectionsHandler(NodeId)
+            {
+                AnnouncementService = announcementService,
+                ServiceHostHelper = serviceHostHelper
+            };
+
+            connectionHandler.Start();
+
+            announcementService.Raise(v => v.OnOnlineEvent += null, this, args);
+
+            Mocks.ReplayAll();
+
+            NodeConnections.Connections = nodeConnections;
+
+            Thread.Sleep(100);
+        }
+
+        [Test]
         public void IfANodeIsAlreadyConnectedAMessageIsWritten()
         {
             StubHelpers(HelperFlags.Address);
@@ -239,8 +337,7 @@ namespace FatCatNode.Tests
 
             var messageWriter = Mocks.DynamicMock<IMessageWriter>();
 
-            messageWriter.Expect(
-                v => v.Message("A node from address {0} is already connected with an Id of {1}.", ipAddress, "Node2"));
+            messageWriter.Expect(v => v.Message("A node from address {0} is already connected with an Id of {1}.", ipAddress, "Node2"));
 
             Mocks.ReplayAll();
 
