@@ -6,6 +6,8 @@ namespace FatCatNode.Logic.Handlers
 {
     internal class OnNodeConnectionHandler
     {
+        private const int MaxNumberOfConnectionAttempts = 4;
+        private const int DelayBetweenConnectionAttempts = 250;
         private int ConnectionAttempts { get; set; }
 
         public void ConnectNode(object sender, NodeAnnoucementEventArgs eventArgs)
@@ -42,7 +44,7 @@ namespace FatCatNode.Logic.Handlers
 
             if (ReAttemptAnotherHandshake(connectionStatus))
             {
-                TimeHelper.Helper.Sleep(750);
+                TimeHelper.Helper.Sleep(DelayBetweenConnectionAttempts);
 
                 AddToConnections(address);
             }
@@ -50,7 +52,7 @@ namespace FatCatNode.Logic.Handlers
 
         private bool ReAttemptAnotherHandshake(NodeConnectionStatus connectionStatus)
         {
-            return connectionStatus == NodeConnectionStatus.ErrorInHandShake && ConnectionAttempts < 2;
+            return connectionStatus == NodeConnectionStatus.ErrorInHandShake && ConnectionAttempts < MaxNumberOfConnectionAttempts;
         }
     }
 }
