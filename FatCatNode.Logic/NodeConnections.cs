@@ -44,6 +44,11 @@ namespace FatCatNode.Logic
             return connectionHandshake.ConnectionStatus;
         }
 
+        public void ResetConnectedNodes()
+        {
+            ConnectedNodes.Clear();
+        }
+
         private void AddToConnectedNodes(ConnectionHandshake connectionHandshake)
         {
             if (connectionHandshake.IsRemoteNodeConnected)

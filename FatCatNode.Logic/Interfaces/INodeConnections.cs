@@ -17,5 +17,7 @@ namespace FatCatNode.Logic.Interfaces
         void SetNodeId(string nodeId);
 
         IRemoteNodeConnectionHelper RemoteHelper { get; set; }
+
+        void ResetConnectedNodes();
     }
 }

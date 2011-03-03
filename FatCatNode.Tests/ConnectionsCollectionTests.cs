@@ -24,6 +24,8 @@ namespace FatCatNode.Tests
             Mocks.VerifyAll();
 
             ResetMessageWriter();
+
+            NodeConnections.Connections.ResetConnectedNodes();
         }
 
         #endregion
@@ -224,6 +226,16 @@ namespace FatCatNode.Tests
             string otherNodeId = NodeConnections.Connections.FindNodeIdByAddress(ConnectionAddress);
 
             Assert.That(otherNodeId, Is.EqualTo("OtherNode"));
+        }
+
+        [Test]
+        public void RemoteHasNotBeenAddedNothingIsReturnedByFindNodeId()
+        {
+            NodeConnections.Connections.SetNodeId("Node2");
+
+            string otherNodeId = NodeConnections.Connections.FindNodeIdByAddress(ConnectionAddress);
+
+            Assert.That(otherNodeId, Is.EqualTo(string.Empty));
         }
     }
 }
