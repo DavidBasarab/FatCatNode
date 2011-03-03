@@ -237,5 +237,31 @@ namespace FatCatNode.Tests
 
             Assert.That(otherNodeId, Is.EqualTo(string.Empty));
         }
+
+        [Test]
+        public void RemoteDidNotConnectSuccessfullyCannotBeIdCannotBeFoundByAddress()
+        {
+            var remoteNodeConnectionHelper = Mocks.DynamicMock<IRemoteNodeConnectionHelper>();
+
+            var otherNode = Mocks.DynamicMock<INode>();
+
+            remoteNodeConnectionHelper.Expect(v => v.OpenRemoteConnection(ConnectionAddress)).Return(otherNode);
+
+            otherNode.Expect(v => v.Handshake("Node2")).Return(string.Empty);
+
+            Mocks.ReplayAll();
+
+            NodeConnections.Connections.RemoteHelper = remoteNodeConnectionHelper;
+
+            NodeConnections.Connections.SetNodeId("Node2");
+
+            NodeConnectionStatus connectionStatus = NodeConnections.Connections.AddNodeToConnections(ConnectionAddress);
+
+            Assert.That(connectionStatus, Is.EqualTo(NodeConnectionStatus.CouldNotConnect));
+
+            string otherNodeId = NodeConnections.Connections.FindNodeIdByAddress(ConnectionAddress);
+
+            Assert.That(otherNodeId, Is.EqualTo(string.Empty));
+        }
     }
 }
