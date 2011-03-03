@@ -8,7 +8,7 @@ namespace FatCatNode.Logic
     {
         public ConnectionHandshake(IPAddress address, IRemoteNodeConnectionHelper remoteConnection, string nodeId)
         {
-            Address = address;
+            RemoteAddress = address;
             RemoteConnection = remoteConnection;
             NodeId = nodeId;
         }
@@ -16,8 +16,8 @@ namespace FatCatNode.Logic
         public string NodeId { get; set; }
 
         private IRemoteNodeConnectionHelper RemoteConnection { get; set; }
-        
-        private IPAddress Address { get; set; }
+
+        public IPAddress RemoteAddress { get; private set; }
 
         public INode RemoteNode { get; set; }
 
@@ -25,7 +25,15 @@ namespace FatCatNode.Logic
 
         public NodeConnectionStatus ConnectionStatus { get; set; }
 
-        public NodeConnectionStatus PerformHandshake()
+        public bool IsRemoteNodeConnected
+        {
+            get
+            {
+                return ConnectionStatus == NodeConnectionStatus.Connected;
+            }
+        }
+
+        public void PerformHandshake()
         {
             try
             {
@@ -39,12 +47,15 @@ namespace FatCatNode.Logic
             }
             catch (Exception)
             {
-                WriteConnectionErrorMessage();
-
-                ConnectionStatus = NodeConnectionStatus.ErrorInHandShake;
+                HandleError();
             }
+        }
 
-            return ConnectionStatus;
+        private void HandleError()
+        {
+            WriteConnectionErrorMessage();
+
+            ConnectionStatus = NodeConnectionStatus.ErrorInHandShake;
         }
 
         private void DetermineConnectionStatus()
@@ -76,17 +87,17 @@ namespace FatCatNode.Logic
 
         private void FindRemoteNode()
         {
-            RemoteNode = RemoteConnection.OpenRemoteConnection(Address);
+            RemoteNode = RemoteConnection.OpenRemoteConnection(RemoteAddress);
         }
 
         private void WriteConnectionErrorMessage()
         {
-            MessageWriter.Writer.Message("Error connecting to node at address {0}.", Address);
+            MessageWriter.Writer.Message("Error connecting to node at address {0}.", RemoteAddress);
         }
 
         private void WriteAttemptingConnectionMessage()
         {
-            MessageWriter.Writer.Message("Attempting to connect to node at address {0}.", Address);
+            MessageWriter.Writer.Message("Attempting to connect to node at address {0}.", RemoteAddress);
         }
     }
 }
