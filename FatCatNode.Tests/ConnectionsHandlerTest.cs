@@ -213,8 +213,6 @@ namespace FatCatNode.Tests
             Mocks.ReplayAll();
 
             NodeConnections.Connections = nodeConnections;
-
-            Thread.Sleep(100);
         }
 
         [Test]
@@ -259,8 +257,6 @@ namespace FatCatNode.Tests
             Mocks.ReplayAll();
 
             NodeConnections.Connections = nodeConnections;
-
-            Thread.Sleep(100);
         }
 
         [Test]
@@ -311,8 +307,6 @@ namespace FatCatNode.Tests
             Mocks.ReplayAll();
 
             NodeConnections.Connections = nodeConnections;
-
-            Thread.Sleep(100);
         }
 
         [Test]
@@ -363,8 +357,6 @@ namespace FatCatNode.Tests
             Mocks.ReplayAll();
 
             NodeConnections.Connections = nodeConnections;
-
-            Thread.Sleep(100);
         }
 
         [Test]
@@ -409,8 +401,6 @@ namespace FatCatNode.Tests
             Mocks.ReplayAll();
 
             NodeConnections.Connections = nodeConnections;
-
-            Thread.Sleep(150);
         }
 
         [Test]
@@ -501,8 +491,6 @@ namespace FatCatNode.Tests
             announcementService.Raise(v => v.OnOfflineEvent += null, this, args);
 
             Mocks.ReplayAll();
-
-            Thread.Sleep(100);
         }
 
         [Test]
@@ -551,8 +539,6 @@ namespace FatCatNode.Tests
             Mocks.ReplayAll();
 
             NodeConnections.Connections = nodeConnections;
-
-            Thread.Sleep(100);
         }
 
         [Test]
@@ -589,8 +575,6 @@ namespace FatCatNode.Tests
             announcementService.Raise(v => v.OnOnlineEvent += null, this, args);
 
             Mocks.ReplayAll();
-
-            Thread.Sleep(100);
         }
 
         [Test]
@@ -665,8 +649,6 @@ namespace FatCatNode.Tests
             announcementService.Raise(v => v.OnOnlineEvent += null, this, args);
 
             Mocks.ReplayAll();
-
-            Thread.Sleep(100);
         }
     }
 }
