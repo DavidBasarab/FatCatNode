@@ -205,6 +205,19 @@ namespace FatCatNode.Tests
         [Test]
         public void ANodeHandShakeSucceededTheNodeIdCanBeFoundByIPAddress()
         {
+            SetUpForSuccessfulConnection();
+
+            NodeConnectionStatus connectionStatus = NodeConnections.Connections.AddNodeToConnections(ConnectionAddress);
+
+            Assert.That(connectionStatus, Is.EqualTo(NodeConnectionStatus.Connected));
+
+            string otherNodeId = NodeConnections.Connections.FindNodeIdByAddress(ConnectionAddress);
+
+            Assert.That(otherNodeId, Is.EqualTo("OtherNode"));
+        }
+
+        private void SetUpForSuccessfulConnection()
+        {
             var remoteNodeConnectionHelper = Mocks.DynamicMock<IRemoteNodeConnectionHelper>();
 
             var otherNode = Mocks.DynamicMock<INode>();
@@ -218,14 +231,6 @@ namespace FatCatNode.Tests
             NodeConnections.Connections.RemoteHelper = remoteNodeConnectionHelper;
 
             NodeConnections.Connections.SetNodeId("Node2");
-
-            NodeConnectionStatus connectionStatus = NodeConnections.Connections.AddNodeToConnections(ConnectionAddress);
-
-            Assert.That(connectionStatus, Is.EqualTo(NodeConnectionStatus.Connected));
-
-            string otherNodeId = NodeConnections.Connections.FindNodeIdByAddress(ConnectionAddress);
-
-            Assert.That(otherNodeId, Is.EqualTo("OtherNode"));
         }
 
         [Test]
@@ -239,7 +244,7 @@ namespace FatCatNode.Tests
         }
 
         [Test]
-        public void RemoteDidNotConnectSuccessfullyCannotBeIdCannotBeFoundByAddress()
+        public void RemoteDidNotConnectSuccessfullyIdCannotBeFoundByAddress()
         {
             var remoteNodeConnectionHelper = Mocks.DynamicMock<IRemoteNodeConnectionHelper>();
 
@@ -258,6 +263,23 @@ namespace FatCatNode.Tests
             NodeConnectionStatus connectionStatus = NodeConnections.Connections.AddNodeToConnections(ConnectionAddress);
 
             Assert.That(connectionStatus, Is.EqualTo(NodeConnectionStatus.CouldNotConnect));
+
+            string otherNodeId = NodeConnections.Connections.FindNodeIdByAddress(ConnectionAddress);
+
+            Assert.That(otherNodeId, Is.EqualTo(string.Empty));
+        }
+
+
+        [Test]
+        public void WhenAConnectionIsRemovedNodeIdIsNotReturned()
+        {
+            SetUpForSuccessfulConnection();
+
+            NodeConnectionStatus connectionStatus = NodeConnections.Connections.AddNodeToConnections(ConnectionAddress);
+
+            Assert.That(connectionStatus, Is.EqualTo(NodeConnectionStatus.Connected));
+
+            NodeConnections.Connections.RemoveNodeFromConnections(ConnectionAddress);
 
             string otherNodeId = NodeConnections.Connections.FindNodeIdByAddress(ConnectionAddress);
 

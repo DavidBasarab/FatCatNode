@@ -470,7 +470,7 @@ namespace FatCatNode.Tests
 
             var nodeConnections = Mocks.DynamicMock<INodeConnections>();
 
-            nodeConnections.Expect(v => v.RemoveNodeFromConnections(ipAddress)).Return(NodeConnectionStatus.Removed);
+            nodeConnections.Expect(v => v.RemoveNodeFromConnections(ipAddress));
 
             var args = new NodeAnnoucementEventArgs
                            {
@@ -510,7 +510,7 @@ namespace FatCatNode.Tests
             var nodeConnections = Mocks.DynamicMock<INodeConnections>();
 
             nodeConnections.Expect(v => v.FindNodeIdByAddress(ipAddress)).Return("Node2");
-            nodeConnections.Expect(v => v.RemoveNodeFromConnections(ipAddress)).Return(NodeConnectionStatus.Removed);
+            nodeConnections.Expect(v => v.RemoveNodeFromConnections(ipAddress));
 
             var messageWriter = Mocks.DynamicMock<IMessageWriter>();
 

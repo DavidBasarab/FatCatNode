@@ -72,7 +72,7 @@ namespace FatCatNode.Logic
 
         public string FindNodeIdByAddress(IPAddress address)
         {
-            if (ConnectedNodes.ContainsKey(address))
+            if (IsAddressInCollection(address))
             {
                 return ConnectedNodes[address]; 
             }
@@ -80,9 +80,17 @@ namespace FatCatNode.Logic
             return string.Empty;
         }
 
-        public NodeConnectionStatus RemoveNodeFromConnections(IPAddress address)
+        private bool IsAddressInCollection(IPAddress address)
         {
-            throw new NotImplementedException();
+            return ConnectedNodes.ContainsKey(address);
+        }
+
+        public void RemoveNodeFromConnections(IPAddress address)
+        {
+            if (ConnectedNodes.ContainsKey(address))
+            {
+                ConnectedNodes.Remove(address);
+            }
         }
 
         public void SetNodeId(string nodeId)
