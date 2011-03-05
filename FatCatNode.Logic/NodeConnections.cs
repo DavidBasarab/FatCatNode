@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Net;
 using FatCatNode.Logic.Handlers;
+using FatCatNode.Logic.Helpers;
 using FatCatNode.Logic.Interfaces;
 
 namespace FatCatNode.Logic
@@ -9,7 +10,7 @@ namespace FatCatNode.Logic
     public class NodeConnections : INodeConnections
     {
         private static INodeConnections _overridenConnections;
-        private Dictionary<IPAddress, string> _connectedNodes;
+        private ThreadSafeDictionary<IPAddress, string> _connectedNodes;
 
         private IRemoteNodeConnectionHelper _remoteHelper;
 
@@ -21,10 +22,9 @@ namespace FatCatNode.Logic
 
         public string NodeId { get; set; }
 
-        public Dictionary<IPAddress, string> ConnectedNodes
+        private ThreadSafeDictionary<IPAddress, string> ConnectedNodes
         {
-            get { return _connectedNodes ?? (_connectedNodes = new Dictionary<IPAddress, string>()); }
-            set { _connectedNodes = value; }
+            get { return _connectedNodes ?? (_connectedNodes = new ThreadSafeDictionary<IPAddress, string>()); }
         }
 
         public IRemoteNodeConnectionHelper RemoteHelper

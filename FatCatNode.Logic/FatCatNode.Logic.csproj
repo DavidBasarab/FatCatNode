@@ -48,6 +48,7 @@
     <Compile Include="Common.cs" />
     <Compile Include="ConnectedNode.cs" />
     <Compile Include="Handlers\DisconnectionNodeHandler.cs" />
+    <Compile Include="Helpers\ThreadSafeDictionary.cs" />
     <Compile Include="Interfaces\IAddressHelper.cs" />
     <Compile Include="Interfaces\IAnnouncementService.cs" />
     <Compile Include="Interfaces\IMessageWriter.cs" />
