@@ -72,12 +72,7 @@ namespace FatCatNode.Logic
 
         public string FindNodeIdByAddress(IPAddress address)
         {
-            if (IsAddressInCollection(address))
-            {
-                return ConnectedNodes[address]; 
-            }
-
-            return string.Empty;
+            return IsAddressInCollection(address) ? ConnectedNodes[address] : string.Empty;
         }
 
         private bool IsAddressInCollection(IPAddress address)
