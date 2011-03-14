@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net;
+﻿using System.Net;
 using FatCatNode.Logic.Handlers;
 using FatCatNode.Logic.Helpers;
 using FatCatNode.Logic.Interfaces;
@@ -49,13 +47,36 @@ namespace FatCatNode.Logic
             ConnectedNodes.Clear();
         }
 
+        public string FindNodeIdByAddress(IPAddress address)
+        {
+            if (IsAddressInCollection(address))
+            {
+                return ConnectedNodes[address];
+            }
+
+            return string.Empty;
+        }
+
+        public void RemoveNodeFromConnections(IPAddress address)
+        {
+            if (ConnectedNodes.ContainsKey(address))
+            {
+                ConnectedNodes.Remove(address);
+            }
+        }
+
+        public void SetNodeId(string nodeId)
+        {
+            NodeId = nodeId;
+        }
+
         private void AddToConnectedNodes(ConnectionHandshake connectionHandshake)
         {
             if (connectionHandshake.IsRemoteNodeConnected)
             {
                 if (IsAddressNotInCollection(connectionHandshake))
                 {
-                    AddAddressToCollection(connectionHandshake); 
+                    AddAddressToCollection(connectionHandshake);
                 }
             }
         }
@@ -70,32 +91,9 @@ namespace FatCatNode.Logic
             return !ConnectedNodes.ContainsKey(connectionHandshake.RemoteAddress);
         }
 
-        public string FindNodeIdByAddress(IPAddress address)
-        {
-            if (IsAddressInCollection(address))
-            {
-                return ConnectedNodes[address]; 
-            }
-
-            return string.Empty;
-        }
-
         private bool IsAddressInCollection(IPAddress address)
         {
             return ConnectedNodes.ContainsKey(address);
-        }
-
-        public void RemoveNodeFromConnections(IPAddress address)
-        {
-            if (ConnectedNodes.ContainsKey(address))
-            {
-                ConnectedNodes.Remove(address);
-            }
-        }
-
-        public void SetNodeId(string nodeId)
-        {
-            NodeId = nodeId;
         }
 
         private class Nested
