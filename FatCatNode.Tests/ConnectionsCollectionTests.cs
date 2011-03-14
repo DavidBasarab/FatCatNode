@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net;
 using FatCatNode.Logic;
+using FatCatNode.Logic.Arguments;
 using FatCatNode.Logic.Interfaces;
 using NUnit.Framework;
 using Rhino.Mocks;
@@ -10,6 +11,8 @@ namespace FatCatNode.Tests
     [TestFixture]
     public class ConnectionsCollectionTests
     {
+        private const string TestNodeId = "Node2";
+
         #region Setup/Teardown
 
         [SetUp]
@@ -97,6 +100,15 @@ namespace FatCatNode.Tests
             NodeConnections.Connections.AddNodeToConnections(ConnectionAddress);
         }
 
+        private HandshakeInformation CreateHandshakeArgument()
+        {
+            return new HandshakeInformation()
+                       {
+                            RemoteNodeId   = TestNodeId,
+                            RemoteNodeAddress = ConnectionAddress
+                       };
+        }
+
         [Test]
         public void ANoneEmptyNodeIdIsReturnedNodeConnectionStatusIsConnected()
         {
@@ -106,13 +118,13 @@ namespace FatCatNode.Tests
 
             remoteNodeConnectionHelper.Expect(v => v.OpenRemoteConnection(ConnectionAddress)).Return(otherNode);
 
-            otherNode.Expect(v => v.Handshake("Node2")).Return("OtherNode");
+            otherNode.Expect(v => v.Handshake(CreateHandshakeArgument())).Return("OtherNode");
 
             Mocks.ReplayAll();
 
             NodeConnections.Connections.RemoteHelper = remoteNodeConnectionHelper;
 
-            NodeConnections.Connections.SetNodeId("Node2");
+            NodeConnections.Connections.SetNodeId(TestNodeId);
 
             NodeConnectionStatus connectionStatus = NodeConnections.Connections.AddNodeToConnections(ConnectionAddress);
 
@@ -128,13 +140,13 @@ namespace FatCatNode.Tests
 
             remoteNodeConnectionHelper.Expect(v => v.OpenRemoteConnection(ConnectionAddress)).Return(otherNode);
 
-            otherNode.Expect(v => v.Handshake("Node2")).Return(null);
+            otherNode.Expect(v => v.Handshake(CreateHandshakeArgument())).Return(null);
 
             Mocks.ReplayAll();
 
             NodeConnections.Connections.RemoteHelper = remoteNodeConnectionHelper;
 
-            NodeConnections.Connections.SetNodeId("Node2");
+            NodeConnections.Connections.SetNodeId(TestNodeId);
 
             NodeConnectionStatus connectionStatus = NodeConnections.Connections.AddNodeToConnections(ConnectionAddress);
 
@@ -169,13 +181,13 @@ namespace FatCatNode.Tests
 
             remoteNodeConnectionHelper.Expect(v => v.OpenRemoteConnection(ConnectionAddress)).Return(otherNode);
 
-            otherNode.Expect(v => v.Handshake("Node2")).Throw(new Exception());
+            otherNode.Expect(v => v.Handshake(CreateHandshakeArgument())).Throw(new Exception());
 
             Mocks.ReplayAll();
 
             NodeConnections.Connections.RemoteHelper = remoteNodeConnectionHelper;
 
-            NodeConnections.Connections.SetNodeId("Node2");
+            NodeConnections.Connections.SetNodeId(TestNodeId);
 
             NodeConnectionStatus connectionStatus = NodeConnections.Connections.AddNodeToConnections(ConnectionAddress);
 
@@ -191,13 +203,13 @@ namespace FatCatNode.Tests
 
             remoteNodeConnectionHelper.Expect(v => v.OpenRemoteConnection(ConnectionAddress)).Return(otherNode);
 
-            otherNode.Expect(v => v.Handshake("Node2"));
+            otherNode.Expect(v => v.Handshake(CreateHandshakeArgument()));
 
             Mocks.ReplayAll();
 
             NodeConnections.Connections.RemoteHelper = remoteNodeConnectionHelper;
 
-            NodeConnections.Connections.SetNodeId("Node2");
+            NodeConnections.Connections.SetNodeId(TestNodeId);
 
             NodeConnections.Connections.AddNodeToConnections(ConnectionAddress);
         }
@@ -224,19 +236,19 @@ namespace FatCatNode.Tests
 
             remoteNodeConnectionHelper.Expect(v => v.OpenRemoteConnection(ConnectionAddress)).Return(otherNode);
 
-            otherNode.Expect(v => v.Handshake("Node2")).Return("OtherNode");
+            otherNode.Expect(v => v.Handshake(CreateHandshakeArgument())).Return("OtherNode");
 
             Mocks.ReplayAll();
 
             NodeConnections.Connections.RemoteHelper = remoteNodeConnectionHelper;
 
-            NodeConnections.Connections.SetNodeId("Node2");
+            NodeConnections.Connections.SetNodeId(TestNodeId);
         }
 
         [Test]
         public void RemoteHasNotBeenAddedNothingIsReturnedByFindNodeId()
         {
-            NodeConnections.Connections.SetNodeId("Node2");
+            NodeConnections.Connections.SetNodeId(TestNodeId);
 
             string otherNodeId = NodeConnections.Connections.FindNodeIdByAddress(ConnectionAddress);
 
@@ -252,13 +264,13 @@ namespace FatCatNode.Tests
 
             remoteNodeConnectionHelper.Expect(v => v.OpenRemoteConnection(ConnectionAddress)).Return(otherNode);
 
-            otherNode.Expect(v => v.Handshake("Node2")).Return(string.Empty);
+            otherNode.Expect(v => v.Handshake(CreateHandshakeArgument())).Return(string.Empty);
 
             Mocks.ReplayAll();
 
             NodeConnections.Connections.RemoteHelper = remoteNodeConnectionHelper;
 
-            NodeConnections.Connections.SetNodeId("Node2");
+            NodeConnections.Connections.SetNodeId(TestNodeId);
 
             NodeConnectionStatus connectionStatus = NodeConnections.Connections.AddNodeToConnections(ConnectionAddress);
 

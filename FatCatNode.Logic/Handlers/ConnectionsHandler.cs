@@ -26,7 +26,7 @@ namespace FatCatNode.Logic.Handlers
 
         public INode ConnectedNode
         {
-            get { return _connectedNode ?? (_connectedNode = new ConnectedNode()); }
+            get { return _connectedNode ?? (_connectedNode = new ConnectedNode(Id)); }
             set { _connectedNode = value; }
         }
 

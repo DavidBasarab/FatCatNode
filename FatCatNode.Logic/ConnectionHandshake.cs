@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Net;
+using FatCatNode.Logic.Arguments;
+using FatCatNode.Logic.Helpers;
 using FatCatNode.Logic.Interfaces;
 
 namespace FatCatNode.Logic
@@ -82,7 +84,16 @@ namespace FatCatNode.Logic
 
         private void FindRemoteNodeId()
         {
-            RemoteNodeId = RemoteNode.Handshake(NodeId);
+            RemoteNodeId = RemoteNode.Handshake(CreateHandshakeInformation());
+        }
+
+        private HandshakeInformation CreateHandshakeInformation()
+        {
+            return new HandshakeInformation()
+                       {
+                           RemoteNodeAddress = AddressHelper.Helper.FindComputerIpAddress(),
+                           RemoteNodeId = NodeId
+                       };
         }
 
         private void FindRemoteNode()

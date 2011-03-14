@@ -49,6 +49,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ConnectedNodeTests.cs" />
     <Compile Include="ConnectionsCollectionTests.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="ListenerTests.cs" />

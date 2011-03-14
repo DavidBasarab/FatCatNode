@@ -33,6 +33,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.ServiceModel.Discovery" />
     <Reference Include="System.Xml.Linq" />
@@ -54,6 +55,7 @@
     <Compile Include="Interfaces\IMessageWriter.cs" />
     <Compile Include="Interfaces\INode.cs" />
     <Compile Include="Interfaces\INodeConnections.cs" />
+    <Compile Include="Arguments\HandshakeInformation.cs" />
     <Compile Include="Interfaces\IRemoteNodeConnectionHelper.cs" />
     <Compile Include="Interfaces\IServiceHostHelper.cs" />
     <Compile Include="Interfaces\ITimeHelper.cs" />
